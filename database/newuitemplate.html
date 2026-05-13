@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrivateCreditNexus AI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nb:#050d1a;--nb9:#0a1628;--nb8:#0f2044;--nb7:#162d5e;--nb6:#1e3f7a;
+  --nb5:#2756a3;--nb4:#3d72c8;--nb3:#6696db;--nb2:#9bbae8;--nb1:#cddaf4;--nb0:#eaf0fb;
+  --acc:#4f9cf9;
+  --s:#fff;--s2:#f7f8fa;--s3:#eef0f4;
+  --bdr:#e2e6ed;--bdr2:#d0d5df;
+  --tx:#0d1117;--tx2:#4b5563;--tx3:#9ca3af;
+  --grn:#10b981;--grn2:#d1fae5;--grn3:#065f46;
+  --amb:#f59e0b;--amb2:#fef3c7;--amb3:#92400e;
+  --red:#ef4444;--red2:#fee2e2;--red3:#991b1b;
+  --pur:#7c3aed;--pur2:#ede9fe;--pur3:#4c1d95;
+  --cy:#0891b2;--cy2:#cffafe;--cy3:#164e63;
+  --font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--s);font-family:var(--font);font-size:14px;color:var(--tx)}
+#app{display:flex;height:100vh}
+
+/* SIDEBAR */
+#sb{width:220px;flex-shrink:0;background:linear-gradient(175deg,var(--nb9) 0%,var(--nb) 100%);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:14px 13px 11px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-brand{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.sb-icon{width:26px;height:26px;background:linear-gradient(135deg,var(--acc),var(--nb4));border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-icon svg{width:13px;height:13px;fill:white}
+.sb-name{font-size:12.5px;font-weight:600;color:#fff}
+.sb-name em{font-style:normal;color:var(--acc)}
+.sb-by{font-size:9px;color:rgba(255,255,255,.28);padding-left:34px}
+.sb-by b{color:var(--nb3);font-weight:500}
+.sb-sect{padding:10px 13px 3px;font-size:9px;font-weight:600;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.12em}
+.sb-nav{padding:0 5px}
+.si{display:flex;align-items:center;gap:7px;padding:6px 8px;margin:0 0 1px;border-radius:5px;cursor:pointer;color:rgba(255,255,255,.45);font-size:12px;transition:all .15s;border:1px solid transparent;position:relative}
+.si:hover{color:#fff;background:rgba(255,255,255,.06)}
+.si.on{color:#fff;background:rgba(79,156,249,.14);border-color:rgba(79,156,249,.22)}
+.si.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:var(--acc);border-radius:0 3px 3px 0}
+.si svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.6;flex-shrink:0}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dg{background:#10b981}.da{background:#f59e0b}.dr{background:#ef4444}.db{background:#60a5fa}.dp{background:#8b5cf6}.dx{background:rgba(255,255,255,.28)}
+.di-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.di-tag{font-size:9px;color:rgba(255,255,255,.2);font-family:var(--mono)}
+.sb-foot{margin-top:auto;padding:8px 9px 10px;border-top:1px solid rgba(255,255,255,.07)}
+.ai-pill{display:flex;align-items:center;gap:5px;padding:5px 8px;background:rgba(79,156,249,.1);border:1px solid rgba(79,156,249,.25);border-radius:5px;font-size:10.5px;color:var(--nb2);margin-bottom:5px}
+.ai-d{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:pp 2s infinite}
+@keyframes pp{0%,100%{opacity:1}50%{opacity:.4}}
+.data-pill{display:flex;align-items:center;gap:5px;padding:4px 8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:5px;font-size:10px;color:rgba(255,255,255,.38);font-family:var(--mono)}
+.data-pill.live{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.2);color:#34d399}
+.d-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2)}
+.d-dot.live{background:var(--grn)}
+.sb-btn{width:100%;margin-top:5px;padding:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:5px;color:rgba(255,255,255,.42);font-size:10.5px;font-family:var(--font);cursor:pointer;transition:all .15s}
+.sb-btn:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.72)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#top{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0}
+.bc{font-size:13px;color:var(--tx2);display:flex;align-items:center;gap:5px;flex:1}
+.bcl{color:var(--nb5);cursor:pointer;font-weight:500}.bcl:hover{color:var(--nb7)}.bcs{color:var(--bdr2)}.bcc{color:var(--tx);font-weight:500}
+.btn{padding:4px 10px;font-size:12px;font-family:var(--font);border:1px solid var(--bdr2);border-radius:5px;background:var(--s2);color:var(--tx2);cursor:pointer;transition:all .12s}
+.btn:hover{border-color:var(--nb2);color:var(--nb6)}
+.btn.pri{background:var(--nb7);color:#fff;border-color:var(--nb7)}.btn.pri:hover{background:var(--nb8)}
+.btn.sm{padding:3px 8px;font-size:11px}
+
+/* BODY */
+#brow{flex:1;display:flex;overflow:hidden}
+#ccol{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#content{flex:1;overflow-y:auto;background:var(--s2)}
+#content::-webkit-scrollbar{width:4px}
+#content::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+#tbar{height:46px;background:var(--s);border-top:1px solid var(--bdr);display:none;align-items:center;padding:0 18px;gap:6px;flex-shrink:0}
+#tbar.show{display:flex}
+.tl{font-size:10px;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+.tb{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;border:1px solid var(--bdr2);background:var(--s2);color:var(--tx2);font-size:11.5px;font-family:var(--font);cursor:pointer;transition:all .15s;white-space:nowrap}
+.tb:hover,.tb.on{border-color:var(--nb4);background:var(--nb0);color:var(--nb6)}
+.tb.busy{border-color:var(--amb);background:var(--amb2);color:var(--amb3);pointer-events:none}
+.tb svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.6;flex-shrink:0}
+
+/* CHAT */
+#chat{width:0;overflow:hidden;transition:width .28s;background:var(--s);border-left:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0}
+#chat.open{width:360px}
+.ch{height:48px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 12px;gap:7px;flex-shrink:0}
+.chav{width:24px;height:24px;background:var(--nb7);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chav svg{width:12px;height:12px;fill:white}
+.chtitle{font-size:12.5px;font-weight:500;color:var(--tx);flex:1}
+.chspin{font-size:9.5px;color:var(--nb5);font-family:var(--mono);background:var(--nb0);border:1px solid var(--nb1);border-radius:5px;padding:2px 7px;display:none}
+.chclose{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:17px;line-height:1;padding:2px 4px;border-radius:3px}
+.chclose:hover{color:var(--tx)}
+.msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.msgs::-webkit-scrollbar{width:3px}
+.msgs::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.msg{display:flex;gap:7px;align-items:flex-start;animation:fi .18s ease}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.msg.u{flex-direction:row-reverse}
+.av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;flex-shrink:0;font-family:var(--mono)}
+.av.ai{background:var(--nb7);color:#fff}.av.u{background:var(--s3);border:1px solid var(--bdr);color:var(--tx2)}
+.bbl{max-width:86%;padding:8px 11px;border-radius:11px;font-size:12px;line-height:1.55}
+.bbl.ai{background:var(--s);border:1px solid var(--bdr);color:var(--tx);border-top-left-radius:3px}
+.bbl.u{background:var(--nb7);color:#fff;border-top-right-radius:3px}
+.bbl table{width:100%;border-collapse:collapse;margin-top:7px;font-size:10.5px;font-family:var(--mono)}
+.bbl table th{background:var(--nb0);color:var(--nb6);padding:4px 6px;text-align:left;font-size:9.5px;font-weight:500}
+.bbl table td{padding:3px 6px;border-bottom:1px solid var(--bdr);color:var(--tx)}
+.bbl table tr:last-child td{border-bottom:none}
+.chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.chip{padding:2px 8px;border:1px solid var(--nb1);border-radius:5px;font-size:10.5px;color:var(--nb5);background:var(--nb0);cursor:pointer;font-family:var(--mono);transition:all .12s}
+.chip:hover{background:var(--nb1);color:var(--nb7)}
+.ldots{display:flex;gap:4px;align-items:center;padding:3px 0}
+.ldots span{width:5px;height:5px;border-radius:50%;background:var(--nb2);animation:ld .9s infinite}
+.ldots span:nth-child(2){animation-delay:.15s}.ldots span:nth-child(3){animation-delay:.3s}
+@keyframes ld{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.cinp{padding:9px 10px;border-top:1px solid var(--bdr);display:flex;gap:6px;flex-shrink:0}
+.cta{flex:1;padding:6px 10px;border:1px solid var(--bdr2);border-radius:5px;font-size:12px;font-family:var(--font);color:var(--tx);background:var(--s2);resize:none;outline:none;max-height:72px;line-height:1.45;transition:border-color .15s}
+.cta:focus{border-color:var(--nb4);background:var(--s)}.cta::placeholder{color:var(--tx3)}
+.csend{width:30px;height:30px;background:var(--nb7);border:none;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;transition:background .15s}
+.csend:hover{background:var(--nb8)}.csend svg{width:12px;height:12px;fill:white}
+
+/* CONTENT */
+.vpad{padding:20px 24px}
+.ptitle{font-size:18px;font-weight:600;color:var(--tx);letter-spacing:-.01em;margin-bottom:2px}
+.psub{font-size:11.5px;color:var(--tx3);font-family:var(--mono);margin-bottom:16px}
+.krow{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:13px}
+.kpi{background:var(--s);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 9px 9px}
+.kpi.bl::after{background:linear-gradient(90deg,var(--nb6),var(--acc))}.kpi.gr::after{background:linear-gradient(90deg,#059669,var(--grn))}.kpi.am::after{background:linear-gradient(90deg,#d97706,var(--amb))}.kpi.re::after{background:linear-gradient(90deg,#b91c1c,var(--red))}.kpi.pu::after{background:linear-gradient(90deg,#6d28d9,var(--pur))}.kpi.cy::after{background:linear-gradient(90deg,#0891b2,var(--cy))}
+.kl{font-size:9.5px;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kv{font-size:20px;font-weight:600;color:var(--tx);line-height:1.1;margin-bottom:2px}
+.ks{font-size:10.5px;font-family:var(--mono)}.ks.up{color:var(--grn)}.ks.ne{color:var(--tx3)}.ks.dn{color:var(--red)}
+.irr-click{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;color:var(--nb5)!important}
+.irr-click:hover{color:var(--nb7)!important}
+.tcol{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
+.card{background:var(--s);border:1px solid var(--bdr);border-radius:11px;padding:14px 16px}
+.ctit{font-size:10.5px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:11px;font-family:var(--mono)}
+.hbar{height:7px;background:var(--s3);border-radius:3px;overflow:hidden;display:flex;gap:2px;margin-bottom:9px}
+.hb{height:100%;border-radius:2px}
+.hleg{display:flex;gap:12px}
+.hli{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx2)}
+.hld{width:7px;height:7px;border-radius:2px}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.mi{background:var(--s2);border-radius:5px;padding:7px 9px}
+.ml{font-size:9.5px;color:var(--tx3);font-family:var(--mono);margin-bottom:2px}
+.mv{font-size:12.5px;font-weight:500;color:var(--tx)}
+.mp{font-size:9.5px;color:var(--grn);margin-top:1px}
+.slbl{font-size:10.5px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)}
+.drow{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--s);border:1px solid var(--bdr);border-radius:5px;margin-bottom:5px;cursor:pointer;transition:all .15s}
+.drow:hover{border-color:var(--bdr2);background:var(--s2);transform:translateX(2px)}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rico{font-size:15px;flex-shrink:0}
+.rname{flex:1;font-weight:500;color:var(--tx);font-size:12.5px}
+.rtag{font-size:9.5px;color:var(--tx3);background:var(--s3);border:1px solid var(--bdr);border-radius:3px;padding:2px 6px;font-family:var(--mono)}
+.rsz{font-size:11.5px;color:var(--tx2);font-family:var(--mono);min-width:52px;text-align:right}
+.rrt{font-size:11.5px;font-family:var(--mono);color:var(--nb5);min-width:44px;text-align:right}
+.rirr{font-size:11.5px;font-family:var(--mono);color:var(--grn3);min-width:52px;text-align:right;background:var(--grn2);border-radius:3px;padding:2px 6px;cursor:pointer}
+.rirr:hover{background:var(--nb0);color:var(--nb6)}
+.badge{display:inline-flex;padding:2px 7px;border-radius:5px;font-size:9.5px;font-weight:600;font-family:var(--mono)}
+.bg{background:var(--grn2);color:var(--grn3)}.ba{background:var(--amb2);color:var(--amb3)}.br{background:var(--red2);color:var(--red3)}.bb{background:var(--nb0);color:var(--nb7)}.bp{background:var(--pur2);color:var(--pur3)}
+
+/* DEAL DETAIL */
+.dtop{display:flex;align-items:flex-start;gap:11px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+.dico{font-size:20px;width:38px;height:38px;background:var(--nb0);border:1px solid var(--nb1);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dname{font-size:16px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.dmeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.dmi{font-size:11px;color:var(--tx3);font-family:var(--mono)}.dsep{color:var(--bdr2)}
+.pg4{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:16px}
+.pm{background:var(--s2);border:1px solid var(--bdr);border-radius:5px;padding:9px 11px}
+.pml{font-size:9.5px;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.pmv{font-size:13px;font-weight:500;color:var(--tx)}
+.pmv.bl{color:var(--nb6)}.pmv.gr{color:var(--grn3)}.pmv.am{color:var(--amb3)}.pmv.pu{color:var(--pur3)}
+.pmv.irr-val{color:var(--nb6);cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.pmv.irr-val:hover{color:var(--nb8)}
+.sh{display:flex;align-items:center;gap:7px;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--bdr)}
+.sht{font-size:10.5px;font-weight:600;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.shp{font-size:9.5px;padding:2px 7px;border-radius:5px;background:var(--nb0);color:var(--nb6);border:1px solid var(--nb1);font-family:var(--mono)}
+.shp.g{background:var(--grn2);color:var(--grn3);border-color:#a7f3d0}.shp.a{background:var(--amb2);color:var(--amb3);border-color:#fde68a}
+
+/* AMORT TABLE */
+.atbl{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-bottom:14px}
+.atbl th{background:var(--nb8);color:rgba(255,255,255,.85);padding:5px 9px;text-align:left;font-size:9.5px;letter-spacing:.05em;font-weight:500;position:sticky;top:0;z-index:1}
+.atbl td{padding:5px 9px;border-bottom:1px solid var(--bdr);color:var(--tx2)}
+.atbl tr:hover td{background:var(--s2)}
+.row-paid td{background:#f0fdf4;color:#166534;opacity:.8}
+.row-paid td:first-child{border-left:3px solid var(--grn)}
+.row-today td{background:#eff6ff;color:var(--nb7);font-weight:600}
+.row-today td:first-child{border-left:3px solid var(--acc)}
+.row-pending td:first-child{border-left:3px solid var(--bdr)}
+.row-overdue td{background:#fff1f2;color:var(--red3)}
+.row-overdue td:first-child{border-left:3px solid var(--red)}
+.sled{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.sledi{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--tx2)}
+.sleds{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.sched-wrap{max-height:300px;overflow-y:auto;border:1px solid var(--bdr);border-radius:7px;margin-bottom:11px}
+.sched-wrap::-webkit-scrollbar{width:4px}
+.sched-wrap::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.info{background:var(--nb0);border:1px solid var(--nb1);border-radius:9px;padding:11px 14px;font-size:11.5px;color:var(--nb6);line-height:1.5;margin-bottom:14px}
+
+/* IRR MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(5,13,26,.5);z-index:900;display:flex;align-items:center;justify-content:center;animation:fi .18s ease}
+.modal{background:var(--s);border-radius:13px;border:1px solid var(--bdr);box-shadow:0 16px 48px rgba(5,13,26,.2);width:540px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+.mhdr{padding:14px 18px 12px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:9px}
+.mico{width:30px;height:30px;background:linear-gradient(135deg,var(--acc),var(--nb4));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mico svg{width:13px;height:13px;fill:white}
+.mtit{font-size:14px;font-weight:600;color:var(--tx);flex:1}
+.msub{font-size:10.5px;color:var(--tx3);font-family:var(--mono)}
+.mclose{background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:2px 5px;border-radius:3px;line-height:1}
+.mclose:hover{color:var(--tx);background:var(--s2)}
+.mbody{padding:18px;overflow-y:auto;flex:1}
+.mbody::-webkit-scrollbar{width:4px}
+.mbody::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.msect{margin-bottom:16px}
+.msect-t{font-size:9.5px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--bdr)}
+.irr-big{font-size:30px;font-weight:700;color:var(--nb6);letter-spacing:-.02em;margin-bottom:2px}
+.irr-sub{font-size:11.5px;color:var(--tx3);font-family:var(--mono)}
+.irr-row{display:flex;align-items:center;justify-content:space-between;padding:6px 9px;background:var(--s2);border-radius:5px;margin-bottom:3px;font-size:12px}
+.irr-row-lbl{color:var(--tx2)}.irr-row-val{font-family:var(--mono);font-weight:500;color:var(--tx)}
+.irr-row-val.pos{color:var(--grn3)}.irr-row-val.hl{color:var(--nb6)}
+.irr-bar{height:20px;background:var(--s3);border-radius:5px;overflow:hidden;display:flex;margin-bottom:5px}
+.irr-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;transition:width .5s ease}
+.irr-formula{background:var(--nb0);border:1px solid var(--nb1);border-radius:7px;padding:11px 13px;font-family:var(--mono);font-size:11px;color:var(--nb6);line-height:1.7;margin-bottom:5px}
+.irr-note{font-size:11px;color:var(--tx3);line-height:1.6;margin-top:5px}
+.factor-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.factor-item{background:var(--s2);border:1px solid var(--bdr);border-radius:5px;padding:8px 11px}
+.fi-l{font-size:9.5px;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.fi-v{font-size:12.5px;font-weight:500;color:var(--tx)}
+.fi-c{font-size:10px;color:var(--tx3);margin-top:2px;line-height:1.4}
+
+/* ── CHARTS PAGE ── */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.chart-card{background:var(--s);border:1px solid var(--bdr);border-radius:11px;padding:16px}
+.chart-card.full{grid-column:1/-1}
+.chart-card canvas{display:block}
+
+/* ── SCENARIO PAGE ── */
+.sc-controls{background:var(--s);border:1px solid var(--bdr);border-radius:11px;padding:16px;margin-bottom:13px}
+.sc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.sc-field{display:flex;flex-direction:column;gap:4px}
+.sc-lbl{font-size:10.5px;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.sc-inp{padding:6px 10px;border:1px solid var(--bdr2);border-radius:5px;font-size:12.5px;font-family:var(--mono);color:var(--tx);background:var(--s2);outline:none;transition:border-color .15s;width:100%}
+.sc-inp:focus{border-color:var(--nb4);background:var(--s)}
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sc-card{background:var(--s);border:1px solid var(--bdr);border-radius:11px;padding:14px 16px;position:relative}
+.sc-card.base{border-color:var(--nb2);background:var(--nb0)}
+.sc-card.best{border-color:#a7f3d0;background:var(--grn2)}
+.sc-card.worst{border-color:#fecaca;background:var(--red2)}
+.sc-badge{font-size:9px;font-weight:600;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:4px;margin-bottom:8px;display:inline-block}
+.sc-badge.base{background:var(--nb1);color:var(--nb7)}
+.sc-badge.best{background:#a7f3d0;color:var(--grn3)}
+.sc-badge.worst{background:#fecaca;color:var(--red3)}
+.sc-badge.cust{background:var(--amb2);color:var(--amb3)}
+.sc-name{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:10px}
+.sc-irr{font-size:24px;font-weight:700;color:var(--nb6);margin-bottom:2px}
+.sc-irr.up{color:var(--grn3)}.sc-irr.dn{color:var(--red3)}
+.sc-delta{font-size:11px;font-family:var(--mono);margin-bottom:8px}
+.sc-delta.pos{color:var(--grn3)}.sc-delta.neg{color:var(--red3)}.sc-delta.ne{color:var(--tx3)}
+.sc-rows{font-size:11px;font-family:var(--mono);color:var(--tx2)}
+.sc-r{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.sc-r:last-child{border-bottom:none}
+.sc-rv{color:var(--tx);font-weight:500}
+.sc-chart-wrap{position:relative;height:200px}
+
+/* ── COVENANT PAGE ── */
+.cov-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.cov-card{background:var(--s);border:1px solid var(--bdr);border-radius:11px;padding:14px 16px}
+.cov-card.breach{border-color:#fca5a5;background:var(--red2)}
+.cov-card.watch{border-color:#fde68a;background:var(--amb2)}
+.cov-card.ok{border-color:#a7f3d0;background:var(--grn2)}
+.cov-tag{font-size:9px;font-weight:600;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:4px;margin-bottom:6px;display:inline-block}
+.cov-tag.breach{background:#fca5a5;color:var(--red3)}.cov-tag.watch{background:#fde68a;color:var(--amb3)}.cov-tag.ok{background:#a7f3d0;color:var(--grn3)}
+.cov-deal{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.cov-type{font-size:11px;color:var(--tx3);font-family:var(--mono);margin-bottom:10px}
+.cov-metric{margin-bottom:8px}
+.cov-ml{font-size:10px;color:var(--tx3);font-family:var(--mono);margin-bottom:4px}
+.cov-bar-wrap{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin-bottom:3px}
+.cov-bar{height:100%;border-radius:4px;transition:width .4s}
+.cov-vals{display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono)}
+.cov-thresh{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.cov-ti{font-size:10.5px;font-family:var(--mono);background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:3px 8px;display:flex;align-items:center;gap:5px;cursor:pointer}
+.cov-ti:hover{border-color:var(--bdr2)}
+.cov-ti label{color:var(--tx3);margin-right:2px}
+.cov-ti input{width:52px;border:none;background:transparent;font-family:var(--mono);font-size:10.5px;color:var(--tx);outline:none}
+.cov-action{font-size:11px;color:var(--tx2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.07);line-height:1.55}
+.cov-table{width:100%;border-collapse:collapse;font-size:11.5px;background:var(--s);border-radius:9px;overflow:hidden;border:1px solid var(--bdr);margin-bottom:14px}
+.cov-table th{background:var(--nb8);color:rgba(255,255,255,.85);padding:6px 12px;text-align:left;font-size:10px;font-weight:500;font-family:var(--mono)}
+.cov-table td{padding:7px 12px;border-bottom:1px solid var(--bdr);vertical-align:top}
+.cov-table tr:last-child td{border-bottom:none}
+.cov-table tr:hover td{background:var(--s2)}
+
+/* CONNECT SCREEN */
+#cs{position:fixed;inset:0;background:var(--s);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:40px}
+.cslogo{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.csico{width:42px;height:42px;background:linear-gradient(135deg,var(--acc),var(--nb4));border-radius:10px;display:flex;align-items:center;justify-content:center}
+.csico svg{width:22px;height:22px;fill:white}
+.csname{font-size:24px;font-weight:600;color:var(--tx)}
+.csname em{font-style:normal;color:var(--nb6)}
+.csby{font-size:11.5px;color:var(--tx3);margin-bottom:5px}
+.csby a{color:var(--nb5);font-weight:500;text-decoration:none}
+.cstag{font-size:12.5px;color:var(--tx2);margin-bottom:28px;text-align:center}
+.cssl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px;font-family:var(--mono)}
+.cscards{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;width:100%;max-width:600px;margin-bottom:18px}
+.cscard{background:var(--s2);border:1.5px solid var(--bdr);border-radius:11px;padding:20px 16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:9px}
+.cscard:hover{border-color:var(--nb4);background:var(--nb0)}
+.cscard.sel{border-color:var(--nb5);background:var(--nb0)}
+.cscico{width:32px;height:32px;background:var(--nb0);border:1px solid var(--nb1);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.cscico svg{width:15px;height:15px;stroke:var(--nb6);fill:none;stroke-width:1.5}
+.csct{font-size:12.5px;font-weight:600;color:var(--tx)}.cscs{font-size:11px;color:var(--tx3);line-height:1.45}
+.csfa{width:100%;max-width:600px;display:none}.csfa.show{display:block}
+.csdrop{border:1.5px dashed var(--bdr2);border-radius:11px;padding:26px;text-align:center;cursor:pointer;transition:all .15s;background:var(--s2)}
+.csdrop:hover,.csdrop.over{border-color:var(--nb4);background:var(--nb0)}
+.csdico{width:36px;height:36px;margin:0 auto 9px;background:var(--nb0);border:1px solid var(--nb1);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.csdico svg{width:17px;height:17px;stroke:var(--nb6);fill:none;stroke-width:1.5}
+.csdt{font-size:12.5px;font-weight:500;color:var(--tx);margin-bottom:2px}.csds{font-size:11px;color:var(--tx3)}
+.csnote{margin-top:10px;padding:9px 12px;background:var(--nb0);border:1px solid var(--nb1);border-radius:5px;font-size:11px;color:var(--nb6);line-height:1.5}
+.csir{display:flex;gap:7px;margin-top:10px}
+.csin{flex:1;padding:7px 11px;border:1px solid var(--bdr2);border-radius:5px;font-size:12.5px;font-family:var(--font);color:var(--tx);background:var(--s2);outline:none}
+.csin:focus{border-color:var(--nb4);background:var(--s)}.csin::placeholder{color:var(--tx3)}
+.cscb{padding:7px 18px;background:var(--nb7);border:none;border-radius:5px;color:#fff;font-size:12.5px;font-weight:500;font-family:var(--font);cursor:pointer}
+.cscb:hover{background:var(--nb8)}
+.csai{display:flex;align-items:center;gap:7px;margin-top:18px;font-size:10.5px;color:var(--tx3);font-family:var(--mono)}
+.csaip{display:flex;align-items:center;gap:4px;padding:3px 9px;background:var(--nb0);border:1px solid var(--nb1);border-radius:5px;color:var(--nb6);font-size:10.5px;font-weight:500}
+.csaid{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:pp 2s infinite}
+
+#dbg{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="sb">
+  <div class="sb-head">
+    <div class="sb-brand">
+      <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+      <div class="sb-name">PrivateCreditNexus<em>AI</em></div>
+    </div>
+    <div class="sb-by">by <b>DataAlpha.ai</b></div>
+  </div>
+  <div class="sb-sect">Views</div>
+  <div class="sb-nav">
+    <div class="si on" id="si-port" onclick="showPortfolio()">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Portfolio
+    </div>
+    <div class="si" id="si-charts" onclick="showCharts()">
+      <svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><line x1="16" y1="7" x2="22" y2="7"/><line x1="22" y1="7" x2="22" y2="13"/></svg>Charts
+    </div>
+    <div class="si" id="si-scenario" onclick="showScenario()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Scenario comparison
+    </div>
+    <div class="si" id="si-cov" onclick="showCovenant()">
+      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"/></svg>Covenant tracker
+    </div>
+  </div>
+  <div class="sb-sect" id="sb-dl" style="display:none">Deals</div>
+  <div id="sb-list"></div>
+  <div class="sb-foot">
+    <div class="ai-pill"><span class="ai-d"></span><span>Claude AI</span></div>
+    <div class="data-pill" id="dpill"><span class="d-dot" id="ddot"></span><span id="dtxt">No data loaded</span></div>
+    <button class="sb-btn" onclick="showCS()">Change data source</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="top">
+    <div class="bc" id="bc"><span class="bcc">PrivateCreditNexus AI</span></div>
+    <button class="btn pri" onclick="showCS()" id="connbtn">Connect data</button>
+  </div>
+  <div id="brow">
+    <div id="ccol">
+      <div id="content"></div>
+      <div id="tbar">
+        <span class="tl">Analysis</span>
+        <button class="tb" id="tb-irr" onclick="openTool('irr')"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>IRR</button>
+        <button class="tb" id="tb-amort" onclick="openTool('amort')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Schedule</button>
+        <button class="tb" id="tb-restr" onclick="openTool('restr')"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Restructure</button>
+        <button class="tb" id="tb-impact" onclick="openTool('impact')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>IRR Impact</button>
+        <button class="tb" id="tb-cov" onclick="openTool('cov')"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"/></svg>Covenants</button>
+      </div>
+    </div>
+    <div id="chat">
+      <div class="ch">
+        <div class="chav"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <span class="chtitle" id="chtitle">Analysis</span>
+        <span class="chspin" id="chspin">thinking…</span>
+        <button class="chclose" onclick="closeChat()">&#215;</button>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="cinp">
+        <textarea class="cta" id="cta" rows="1" placeholder="Ask a question…" onkeydown="ck(event)" oninput="ar(this)"></textarea>
+        <button class="csend" onclick="sendMsg()"><svg viewBox="0 0 16 16"><path d="M2 8l12-6-4 6 4 6L2 8z"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="irrModal" style="display:none"></div>
+
+<div id="cs">
+  <div class="cslogo">
+    <div class="csico"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <div class="csname">PrivateCreditNexus<em>AI</em></div>
+  </div>
+  <div class="csby">by <a href="#">DataAlpha.ai</a></div>
+  <div class="cstag">Connect your portfolio data to begin</div>
+  <div class="cssl">Choose data source</div>
+  <div class="cscards">
+    <div class="cscard" id="cc-file" onclick="pickSrc('file')">
+      <div class="cscico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="csct">Upload file</div>
+      <div class="cscs">Excel, CSV, or JSON from your device</div>
+    </div>
+    <div class="cscard" id="cc-path" onclick="pickSrc('path')">
+      <div class="cscico"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+      <div class="csct">File path / URL</div>
+      <div class="cscs">Shared drive path or URL</div>
+    </div>
+    <div class="cscard" id="cc-server" onclick="pickSrc('server')">
+      <div class="cscico"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
+      <div class="csct">API / server</div>
+      <div class="cscs">Connect to your firm's data endpoint</div>
+    </div>
+  </div>
+  <div class="csfa" id="csfa">
+    <div id="cff" style="display:none">
+      <div class="csdrop" id="dropz" onclick="document.getElementById('fip').click()" ondragover="dov(event)" ondragleave="dlv()" ondrop="ddp(event)">
+        <div class="csdico"><svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></div>
+        <div class="csdt">Drop file or click to browse</div>
+        <div class="csds">.xlsx &middot; .csv &middot; .json</div>
+      </div>
+      <input type="file" id="fip" accept=".xlsx,.xls,.csv,.json" style="display:none" onchange="fch(event)">
+      <div class="csnote"><strong>Detected automatically:</strong> Borrower · Instrument · Principal · Rate · Tenure · Orig Fee · EOT Fee · PIK · Status · Origination Date</div>
+    </div>
+    <div id="cfp" style="display:none"><div class="csir"><input class="csin" id="pathin" placeholder="https://…/portfolio.xlsx"><button class="cscb" onclick="connPath()">Connect</button></div></div>
+    <div id="cfs" style="display:none"><div class="csir"><input class="csin" id="srvrin" placeholder="https://api.firm.com/portfolio"><button class="cscb" onclick="connSrv()">Connect</button></div></div>
+  </div>
+  <div class="csai"><div class="csaip"><span class="csaid"></span>Claude AI ready</div>IRR · amortization · restructure powered by Claude</div>
+</div>
+<div id="dbg"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── STATE ──
+var D=[],CD=null,CH=[],CT='';
+var TODAY=new Date();TODAY.setHours(0,0,0,0);
+var _charts={};
+var COV_THRESHOLDS={};// deal_id -> {metric:threshold}
+
+// ── DEBUG ──
+var DBG_LINES=[];
+function dbg(m){DBG_LINES.push(m);var e=document.getElementById('dbg');e.style.display='block';e.innerHTML=DBG_LINES.join('<br>');e.scrollTop=e.scrollHeight;}
+function clearDbg(){DBG_LINES=[];document.getElementById('dbg').innerHTML='';}
+
+// ── IRR MATH ──
+function calcIRR(cfs,guess){
+  var r=guess||0.01,tol=1e-7;
+  for(var i=0;i<200;i++){
+    var npv=0,dn=0;
+    for(var j=0;j<cfs.length;j++){var p=Math.pow(1+r,j);npv+=cfs[j]/p;if(j>0)dn-=j*cfs[j]/((1+r)*p);}
+    if(Math.abs(dn)<1e-12)break;
+    var r2=r-npv/dn;
+    if(Math.abs(r2-r)<tol){r=r2;break;}
+    r=r2;if(r<-0.9999)r=0.0001;
+  }
+  return isFinite(r)?r:null;
+}
+function buildCashFlows(d){
+  var P=d.principal,mr=d.rate/12,mpik=(d.pik_rate||0)/12;
+  var cfs=[-P*(1-(d.orig_fee||0))];
+  var bal=P,mp=d.amort>0?P/d.amort:0;
+  for(var m=1;m<=d.tenure;m++){
+    var interest=bal*mr,pik=bal*mpik,prin=(m<=d.io)?0:mp;
+    if(m===d.tenure&&d.amort>0)prin=bal;
+    var eot=(m===d.tenure)?bal*(d.eot_fee||0):0;
+    cfs.push(interest+prin+eot);
+    bal=bal-prin+pik;if(bal<0)bal=0;
+  }
+  return cfs;
+}
+function dealIRR(d){
+  if(!d||!d.principal||!d.rate)return null;
+  var cfs=buildCashFlows(d),m=calcIRR(cfs);
+  if(m===null)return null;
+  var ann=Math.pow(1+m,12)-1;
+  var P=d.principal,bal=P,mp=d.amort>0?P/d.amort:0,ti=0;
+  for(var i=1;i<=d.tenure;i++){ti+=bal*(d.rate/12);var pr=(i<=d.io)?0:mp;if(i===d.tenure&&d.amort>0)pr=bal;bal-=pr;if(bal<0)bal=0;}
+  var of=P*(d.orig_fee||0),ef=P*(d.eot_fee||0);
+  return{mIRR:m,annIRR:ann,totalInterest:ti,origFeeAmt:of,eotFeeAmt:ef,totalIncome:ti+of+ef,
+    MOIC:(ti+of+ef+P)/P,couponBps:Math.round(d.rate*10000),
+    origBps:Math.round(((d.orig_fee||0)/d.tenure*12)*10000),
+    eotBps:Math.round(((d.eot_fee||0)/d.tenure*12)*10000),
+    pikBps:Math.round((d.pik_rate||0)*10000)};
+}
+function portfolioIRR(){
+  if(!D.length)return null;
+  var tot=D.reduce(function(s,d){return s+(d.principal||0)},0);
+  if(!tot)return null;
+  var wt=0;D.forEach(function(d){var r=dealIRR(d);if(r&&d.principal)wt+=r.annIRR*(d.principal/tot);});
+  return wt;
+}
+
+// ── INSTRUMENTS ──
+var IC={'term loan':{l:'Term Loan',i:'💼',t:['irr','amort','restr','impact','cov']},'senior secured tl':{l:'Secured TL',i:'🏦',t:['irr','amort','restr','impact','cov']},'bridge loan':{l:'Bridge Loan',i:'🌉',t:['irr','restr','impact','cov']},'convertible note':{l:'Conv. Note',i:'🔄',t:['irr','restr','impact']},'revenue-based note':{l:'Rev. Note',i:'📈',t:['irr','restr','impact']},'warrant':{l:'Warrant',i:'⚡',t:['irr']},'note':{l:'Note',i:'📝',t:['irr','restr','impact','cov']}};
+function gc(d){var k=(d.instrument_type||'').toLowerCase().trim();return IC[k]||IC['term loan'];}
+var SD={compliant:'dg',monitoring:'da','breach risk':'dr'};
+var SB={compliant:'bg',monitoring:'ba','breach risk':'br'};
+var ST={compliant:'Compliant',monitoring:'Monitoring','breach risk':'Breach risk'};
+
+// ── UTILS ──
+function hE(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fD(v){v=parseFloat(v)||0;if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'$'+(v/1e3).toFixed(0)+'K';return'$'+Math.round(v).toLocaleString()}
+function fP(v){return((parseFloat(v)||0)*100).toFixed(2)+'%'}
+function fPct1(v){return((parseFloat(v)||0)*100).toFixed(1)+'%'}
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,72)+'px'}
+function ck(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}}
+function normKey(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+var _cc=null,_cr=null;
+function getCC(r){if(r===_cr)return _cc;var c={};Object.keys(r).forEach(function(k){c[normKey(k)]=r[k];});_cc=c;_cr=r;return c;}
+function col(r,keys){
+  var c=getCC(r);
+  for(var i=0;i<keys.length;i++){
+    var nk=normKey(keys[i]);
+    if(c[nk]!==undefined&&c[nk]!==null&&String(c[nk]).trim()!=='')return c[nk];
+    for(var ck in c){if((ck.includes(nk)||nk.includes(ck))&&ck.length>=3&&nk.length>=3&&c[ck]!==undefined&&c[ck]!==null&&String(c[ck]).trim()!=='')return c[ck];}
+  }
+  return '';
+}
+function nC(r,keys){var v=col(r,keys);if(v===''||v===undefined)return 0;return parseFloat(String(v).replace(/[$,%\s,]/g,'').replace(/[()]/g,'-'))||0;}
+function pC(r,keys){var v=nC(r,keys);return v>1?v/100:v;}
+
+// ── NORMALISE ROW ──
+function normRow(r,idx){
+  _cr=null;
+  if(idx===0)dbg('Keys: '+Object.keys(r).join(' | '));
+  var name=col(r,['Borrower','Company','Name','Borrower Name','Deal Name','Company Name','Fund Name','Entity','Issuer']);
+  var inst=String(col(r,['Instrument Type','Instrument','Type','Product','Debt Type','Facility Type'])||'term loan').toLowerCase().trim();
+  var principal=nC(r,['Principal','Principal ($)','Loan Amount','Commitment','Deal Size','Facility Size','Amount','Loan Size','Face Value','Investment Amount']);
+  if(!principal){Object.keys(r).forEach(function(k){var v=parseFloat(String(r[k]||'').replace(/[$,%,\s]/g,''));if(v>=10000&&!principal)principal=v;});}
+  var rate=pC(r,['Interest Rate','Rate','Coupon','Cash Coupon','All-in Rate','Yield','Rate (%)','Annual Rate']);
+  if(!rate){Object.keys(r).forEach(function(k){if(rate)return;var kl=normKey(k);if(kl.includes('rate')||kl.includes('coupon')||kl.includes('yield')){var v=parseFloat(String(r[k]||'').replace(/[%,\s]/g,''));if(v>0)rate=v>1?v/100:v;}});}
+  if(!rate)rate=0.12;
+  var tenure=parseInt(String(col(r,['Tenure','Tenor','Term','Tenure (Mo.)','Tenor (Mo.)','Term (Mo.)','Term Months','Duration','Loan Term'])||'').replace(/[^0-9]/g,'')||'36')||36;
+  var status=String(col(r,['Covenant Status','Status','Health','Covenant','Credit Status'])||'compliant').toLowerCase().trim();
+  if(status.includes('breach')||status.includes('default')||status.includes('violation'))status='breach risk';
+  else if(status.includes('monitor')||status.includes('watch')||status.includes('review'))status='monitoring';
+  else status='compliant';
+  var ioRaw=col(r,['IO Period','IO Months','IO (Mo.)','IO Period (Mo.)','Interest Only','IO']);
+  var io=ioRaw?parseInt(String(ioRaw).replace(/[^0-9]/g,''))||0:Math.round(tenure*0.2)||6;
+  var origFee=pC(r,['Orig Fee','Origination Fee','Orig. Fee','Upfront Fee','Arrangement Fee','Front End Fee']);
+  var eotFee=pC(r,['EOT Fee','End of Term Fee','Exit Fee','EoT Fee','Maturity Fee','Back End Fee']);
+  var pikRate=pC(r,['PIK Rate','PIK','PIK (%)','Payment-in-Kind']);
+  if(!origFee)origFee=0.02;if(!eotFee)eotFee=0.025;
+  var origRaw=col(r,['Origination Date','Close Date','Closing Date','Issue Date','Start Date','Funding Date','Date','Trade Date']);
+  var origDate=null;
+  if(origRaw){
+    if(origRaw instanceof Date){origDate=new Date(origRaw);}
+    else if(typeof origRaw==='number'&&origRaw>40000){origDate=new Date(Math.round((origRaw-25569)*86400*1000));}
+    else{var p2=new Date(origRaw);if(!isNaN(p2.getTime()))origDate=p2;}
+  }
+  if(!origDate){origDate=new Date(TODAY);origDate.setMonth(origDate.getMonth()-Math.round(tenure*0.4));}
+  if(idx<3)dbg('Deal '+idx+': "'+name+'" P='+principal+' r='+rate+' t='+tenure);
+  return{id:'D'+(idx+1).toString().padStart(3,'0'),deal_id:col(r,['Deal ID','ID','Ref'])||('D'+(idx+1)),name:name||('Deal '+(idx+1)),instrument_type:inst,principal:principal||0,rate:rate,io:io,amort:tenure-io,tenure:tenure,orig_fee:origFee,eot_fee:eotFee,pik_rate:pikRate||0,outstanding:nC(r,['Outstanding','Outstanding ($)','Outstanding Balance'])||principal||0,warrant:col(r,['Warrant','Warrant Coverage','Warrants'])||'',status:status,sector:col(r,['Sector','Industry','Vertical'])||'',stage:col(r,['Stage','Company Stage','Round'])||'',maturity:col(r,['Maturity Date','Maturity','Due Date'])||'',origination:origDate,originationRaw:origRaw,interest_type:col(r,['Interest Type','Rate Type'])||'Fixed'};
+}
+
+// ── CONNECT ──
+function showCS(){document.getElementById('cs').style.display='flex';}
+function pickSrc(t){['file','path','server'].forEach(function(x){document.getElementById('cc-'+x).classList.toggle('sel',x===t);document.getElementById('cf'+(x==='file'?'f':x==='path'?'p':'s')).style.display=x===t?'block':'none';});document.getElementById('csfa').classList.add('show');}
+function dov(e){e.preventDefault();document.getElementById('dropz').classList.add('over');}
+function dlv(){document.getElementById('dropz').classList.remove('over');}
+function ddp(e){e.preventDefault();dlv();if(e.dataTransfer&&e.dataTransfer.files[0])pf(e.dataTransfer.files[0]);}
+function fch(e){if(e.target.files&&e.target.files[0])pf(e.target.files[0]);}
+function connPath(){var u=(document.getElementById('pathin').value||'').trim();if(!u){alert('Enter a URL');return;}applyDeals([],u);}
+function connSrv(){var u=(document.getElementById('srvrin').value||'').trim();if(!u){alert('Enter URL');return;}applyDeals([],u);}
+
+function pf(file){
+  clearDbg();
+  var ext=(file.name.split('.').pop()||'').toLowerCase();
+  dbg('File: '+file.name+' ('+Math.round(file.size/1024)+'KB)');
+  var rd=new FileReader();
+  rd.onload=function(ev){
+    try{
+      var rows=[];
+      if(ext==='json'){rows=JSON.parse(ev.target.result);rows=Array.isArray(rows)?rows:(rows.deals||rows.portfolio||rows.data||[]);}
+      else if(ext==='csv'){rows=parseCSV(ev.target.result);}
+      else{
+        var wb=XLSX.read(ev.target.result,{type:'array',cellDates:true,raw:false});
+        dbg('Sheets: '+wb.SheetNames.join(' | '));
+        var hdrKw=['borrower','company','name','principal','loan','instrument','amount','deal'];
+        var best=wb.SheetNames[0],bsc=-1;
+        wb.SheetNames.forEach(function(sn){
+          var ws=wb.Sheets[sn];if(!ws['!ref'])return;
+          var all=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+          var sc=0;for(var i=0;i<Math.min(all.length,15);i++){var rs=all[i].join(' ').toLowerCase();hdrKw.forEach(function(kw){if(rs.includes(kw))sc+=2;});}
+          sc+=Math.min(all.length,50);
+          dbg('Sheet "'+sn+'" sc='+sc);
+          if(sc>bsc){bsc=sc;best=sn;}
+        });
+        dbg('Using: "'+best+'"');
+        var ws=wb.Sheets[best];
+        var all=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        for(var d0=0;d0<Math.min(all.length,5);d0++)dbg('R'+d0+': '+all[d0].slice(0,8).map(function(v){return JSON.stringify(v)}).join('|'));
+        var hi=-1,hdr=[],bhs=-1;
+        for(var i=0;i<Math.min(all.length,20);i++){
+          var r=all[i],sc2=0;
+          r.forEach(function(c){var s=String(c||'').toLowerCase().trim();hdrKw.forEach(function(kw){if(s===kw||s.includes(kw))sc2++;});});
+          var ne=r.filter(function(c){return String(c||'').trim()!==''}).length;
+          if(sc2>bhs&&ne>=2){bhs=sc2;hi=i;hdr=r.slice();}
+        }
+        if(hi<0){for(var i=0;i<all.length;i++){var ne=all[i].filter(function(c){return String(c||'').trim()!==''}).length;if(ne>=3){hi=i;hdr=all[i].slice();break;}}}
+        if(hi<0){alert('Cannot find header row.');return;}
+        hdr=hdr.map(function(h){return String(h||'').replace(/[\r\n]+/g,' ').trim();});
+        dbg('Header row '+hi+': '+hdr.slice(0,10).join(' | '));
+        for(var k=hi+1;k<all.length;k++){
+          var row=all[k];
+          var ne=row.filter(function(c){return String(c||'').trim()!==''}).length;
+          if(ne<2)continue;
+          var first=String(row[0]||row[1]||'').trim().toUpperCase();
+          if(first.startsWith('TOTAL')||first.startsWith('SUBTOTAL')||first.startsWith('GRAND'))continue;
+          var obj={};
+          for(var m2=0;m2<hdr.length;m2++){if(hdr[m2])obj[hdr[m2]]=row[m2]!==undefined?row[m2]:'';}
+          rows.push(obj);
+        }
+      }
+      dbg(rows.length+' rows parsed');
+      if(!rows.length){alert('No data rows found. Check debug panel.');return;}
+      applyDeals(rows,file.name);
+    }catch(err){dbg('ERROR: '+err.message);alert('Parse error: '+err.message);}
+  };
+  rd.onerror=function(){alert('Cannot read file.');};
+  if(ext==='xlsx'||ext==='xls')rd.readAsArrayBuffer(file);else rd.readAsText(file);
+}
+function parseCSV(txt){var lines=txt.trim().split('\n');if(!lines.length)return[];var h=lines[0].split(',').map(function(x){return x.trim().replace(/"/g,'')});var out=[];for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var v=lines[i].split(',').map(function(x){return x.trim().replace(/"/g,'')});var o={};h.forEach(function(k,j){o[k]=v[j]||''});out.push(o);}return out;}
+
+function applyDeals(raw,src){
+  D=raw.map(normRow);
+  var dot=document.getElementById('ddot'),pill=document.getElementById('dpill');
+  dot.classList.add('live');pill.classList.add('live');
+  document.getElementById('dtxt').textContent=(src.length>24?src.slice(0,21)+'…':src);
+  document.getElementById('sb-dl').style.display=D.length?'block':'none';
+  document.getElementById('connbtn').textContent='Switch source';
+  buildList();document.getElementById('cs').style.display='none';
+  showPortfolio();
+}
+
+// ── SIDEBAR ──
+function buildList(){
+  var h='';D.forEach(function(d){var dot=SD[d.status]||'dx';h+='<div class="si" id="si-'+d.id+'" onclick="showDeal(\''+d.id+'\')">'+'<span class="sb-dot '+dot+'"></span><span class="di-name">'+hE(d.name)+'</span><span class="di-tag">'+gc(d).l+'</span></div>';});
+  document.getElementById('sb-list').innerHTML=h;
+}
+function setActive(id){document.querySelectorAll('.si').forEach(function(el){el.classList.remove('on')});var el=document.getElementById(id);if(el)el.classList.add('on');}
+function setBc(items){document.getElementById('bc').innerHTML=items.map(function(it,i){return i<items.length-1?'<span class="bcl" onclick="'+it.fn+'">'+hE(it.l)+'</span><span class="bcs">/</span>':'<span class="bcc">'+hE(it.l)+'</span>';}).join('');}
+function getDeal(id){for(var i=0;i<D.length;i++){if(D[i].id===id)return D[i];}return null;}
+
+// ── IRR MODAL ──
+function showIRRModal(d,portIRR){
+  var isPort=!d,irr=isPort?null:dealIRR(d),annIRR=isPort?portIRR:irr?irr.annIRR:null;
+  var title=isPort?'Portfolio IRR breakdown':(d.name+' — IRR breakdown');
+  var irrStr=annIRR!==null?fPct1(annIRR):'N/A';
+  var body='<div class="msect"><div class="msect-t">Effective IRR (annualised)</div><div class="irr-big">'+irrStr+'</div><div class="irr-sub">'+(isPort?'Portfolio weighted-average EIR':'All-in EIR including fees')+'</div></div>';
+  if(!isPort&&irr){
+    var tot=(irr.couponBps+irr.origBps+irr.eotBps+irr.pikBps)||1;
+    var cp=Math.round(irr.couponBps/tot*100),op=Math.round(irr.origBps/tot*100),ep=Math.round(irr.eotBps/tot*100),pp=Math.round(irr.pikBps/tot*100);
+    body+='<div class="msect"><div class="msect-t">IRR decomposition</div>'
+      +'<div class="irr-bar"><div class="irr-seg" style="width:'+cp+'%;background:var(--nb6)">Coupon</div><div class="irr-seg" style="width:'+op+'%;background:var(--grn)">Orig</div><div class="irr-seg" style="width:'+ep+'%;background:var(--amb)">EOT</div>'+(irr.pikBps?'<div class="irr-seg" style="width:'+pp+'%;background:var(--pur)">PIK</div>':'')+'</div>'
+      +'<div class="irr-row"><span class="irr-row-lbl">Cash coupon ('+fPct1(d.rate)+')</span><span class="irr-row-val hl">'+irr.couponBps+' bps</span></div>'
+      +'<div class="irr-row"><span class="irr-row-lbl">Origination fee ('+fPct1(d.orig_fee)+' amortised)</span><span class="irr-row-val pos">+'+irr.origBps+' bps</span></div>'
+      +'<div class="irr-row"><span class="irr-row-lbl">EOT fee ('+fPct1(d.eot_fee)+' amortised)</span><span class="irr-row-val pos">+'+irr.eotBps+' bps</span></div>'
+      +(irr.pikBps?'<div class="irr-row"><span class="irr-row-lbl">PIK ('+fPct1(d.pik_rate)+')</span><span class="irr-row-val pos">+'+irr.pikBps+' bps</span></div>':'')
+      +'<div class="irr-row" style="background:var(--nb0);border:1px solid var(--nb1)"><span class="irr-row-lbl" style="font-weight:600">All-in EIR</span><span class="irr-row-val hl" style="font-weight:700">'+irrStr+'</span></div></div>';
+    body+='<div class="msect"><div class="msect-t">Income breakdown</div><div class="factor-grid">'
+      +'<div class="factor-item"><div class="fi-l">Total interest</div><div class="fi-v">'+fD(irr.totalInterest)+'</div><div class="fi-c">Over '+d.tenure+' months</div></div>'
+      +'<div class="factor-item"><div class="fi-l">Origination fee</div><div class="fi-v">'+fD(irr.origFeeAmt)+'</div><div class="fi-c">'+fPct1(d.orig_fee)+' upfront</div></div>'
+      +'<div class="factor-item"><div class="fi-l">EOT fee</div><div class="fi-v">'+fD(irr.eotFeeAmt)+'</div><div class="fi-c">'+fPct1(d.eot_fee)+' at maturity</div></div>'
+      +'<div class="factor-item"><div class="fi-l">MOIC</div><div class="fi-v">'+irr.MOIC.toFixed(2)+'x</div><div class="fi-c">Return multiple</div></div>'
+      +'</div></div>';
+  }
+  if(isPort){
+    body+='<div class="msect"><div class="msect-t">Per-deal IRR</div>'+D.map(function(dd){var r=dealIRR(dd);return'<div class="irr-row"><span class="irr-row-lbl">'+hE(dd.name)+'</span><span class="irr-row-val '+(r&&r.annIRR>0.12?'pos':'hl')+'">'+( r?fPct1(r.annIRR):'N/A')+'</span></div>';}).join('')+'</div>';
+  }
+  body+='<div class="msect"><div class="msect-t">How IRR is calculated</div><div class="irr-formula">0 = CF₀ + CF₁/(1+r) + CF₂/(1+r)² + … + CFₙ/(1+r)ⁿ<br><br>CF₀ = −Principal × (1 − Origination Fee)<br>CFₜ = Monthly interest + Principal repayment<br>CFₙ = Final payment + EOT fee + remaining balance<br>r = monthly IRR solved via Newton-Raphson<br>Annual EIR = (1 + r)¹² − 1</div><div class="irr-note">IRR finds the discount rate where NPV of all cash flows = 0. Accounts for IO period, amortization, upfront origination fee, EOT exit fee, and PIK accrual.</div></div>';
+  var modal=document.getElementById('irrModal');
+  modal.innerHTML='<div class="modal-bg" onclick="closeIRRModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="mhdr"><div class="mico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg></div><div><div class="mtit">'+hE(title)+'</div><div class="msub">'+(isPort?D.length+' deals':'')+'</div></div><button class="mclose" onclick="closeIRRModal()">&#215;</button></div><div class="mbody">'+body+'</div></div></div>';
+  modal.style.display='block';
+}
+function closeIRRModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('irrModal').style.display='none';}
+
+// ── PORTFOLIO VIEW ──
+function showPortfolio(){
+  CD=null;closeChat();setActive('si-port');setBc([{l:'Portfolio overview',fn:''}]);document.getElementById('tbar').classList.remove('show');
+  if(!D.length){document.getElementById('content').innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center"><div style="font-size:44px;margin-bottom:14px">📂</div><div style="font-size:15px;font-weight:600;color:var(--tx);margin-bottom:6px">No portfolio data</div><div style="font-size:12px;color:var(--tx3);margin-bottom:18px">Upload your portfolio file to get started.</div><button class="btn pri" onclick="showCS()">Connect data source</button></div>';return;}
+  var total=D.length,aum=0,nCC=0,nM=0,nB=0,instMap={};
+  D.forEach(function(d){aum+=d.principal||0;var s=d.status;if(s==='compliant')nCC++;else if(s==='monitoring')nM++;else if(s==='breach risk')nB++;var l=gc(d).l;instMap[l]=(instMap[l]||0)+1;});
+  var avgDeal=total?aum/total:0,wtdRate=aum>0?D.reduce(function(s,d){return s+(d.rate*(d.principal/(aum||1)))},0):0;
+  var portIRRVal=portfolioIRR(),cp=total?Math.round(nCC/total*100):0,mp=total?Math.round(nM/total*100):0,rp=total?Math.round(nB/total*100):0;
+  var mixH=Object.keys(instMap).map(function(k){return'<div class="mi"><div class="ml">'+hE(k)+'</div><div class="mv">'+instMap[k]+'</div><div class="mp">'+Math.round(instMap[k]/total*100)+'%</div></div>';}).join('');
+  var rowsH=D.map(function(d){var cfg=gc(d),dot=SD[d.status]||'dx',bdg=SB[d.status]||'bb',stxt=ST[d.status]||d.status;var iv=dealIRR(d);return'<div class="drow" onclick="showDeal(\''+d.id+'\')">'+'<span class="rdot '+dot+'"></span><span class="rico">'+cfg.i+'</span><span class="rname">'+hE(d.name)+'</span>'+(d.sector?'<span class="rtag">'+hE(d.sector)+'</span>':'')+'<span class="rtag">'+cfg.l+'</span><span class="rsz">'+fD(d.principal)+'</span><span class="rrt">'+fP(d.rate)+'</span><span class="rirr" onclick="event.stopPropagation();showIRRModal(getDeal(\''+d.id+'\'))">EIR '+(iv?fPct1(iv.annIRR):'—')+'</span><span class="badge '+bdg+'">'+hE(stxt)+'</span></div>';}).join('');
+  document.getElementById('content').innerHTML='<div class="vpad"><div class="ptitle">Portfolio overview</div><div class="psub">'+total+' deals · '+Object.keys(instMap).join(', ')+'</div>'
+    +'<div class="krow">'
+    +'<div class="kpi bl"><div class="kl">AUM</div><div class="kv">'+fD(aum)+'</div><div class="ks ne">'+total+' deals</div></div>'
+    +'<div class="kpi bl"><div class="kl">Deals</div><div class="kv">'+total+'</div><div class="ks ne">'+Object.keys(instMap).length+' types</div></div>'
+    +'<div class="kpi gr"><div class="kl">Avg size</div><div class="kv">'+fD(avgDeal)+'</div><div class="ks ne">per deal</div></div>'
+    +'<div class="kpi am"><div class="kl">Wtd rate</div><div class="kv">'+fP(wtdRate)+'</div><div class="ks ne">cash coupon</div></div>'
+    +'<div class="kpi cy"><div class="kl">Portfolio IRR</div><div class="kv irr-click" onclick="showIRRModal(null,'+(portIRRVal||0)+')">'+(portIRRVal?fPct1(portIRRVal):'N/A')+'</div><div class="ks ne">wtd-avg EIR</div></div>'
+    +'<div class="kpi re"><div class="kl">Breach risk</div><div class="kv" style="color:var(--red)">'+nB+'</div><div class="ks dn">'+rp+'% of portfolio</div></div>'
+    +'</div>'
+    +'<div class="tcol"><div class="card"><div class="ctit">Deal health</div><div class="hbar"><div class="hb" style="width:'+cp+'%;background:var(--grn)"></div><div class="hb" style="width:'+mp+'%;background:var(--amb)"></div><div class="hb" style="width:'+rp+'%;background:var(--red)"></div></div><div class="hleg"><div class="hli"><div class="hld" style="background:var(--grn)"></div>'+nCC+' Compliant</div><div class="hli"><div class="hld" style="background:var(--amb)"></div>'+nM+' Watch</div><div class="hli"><div class="hld" style="background:var(--red)"></div>'+nB+' Breach</div></div></div>'
+    +'<div class="card"><div class="ctit">Instrument mix</div><div class="mg">'+mixH+'</div></div></div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><div class="slbl">All deals</div><button class="btn sm" onclick="runPortfolioAnalysis()">&#9654; AI analysis</button></div>'
+    +rowsH+'</div>';
+}
+
+// ── DEAL VIEW ──
+function showDeal(id){
+  var d=getDeal(id);if(!d)return;
+  CD=d;CH=[];setActive('si-'+id);setBc([{l:'Portfolio overview',fn:'showPortfolio()'},{l:d.name,fn:''}]);
+  var cfg=gc(d),bdg=SB[d.status]||'bb',stxt=ST[d.status]||d.status;
+  document.getElementById('tbar').classList.add('show');
+  ['irr','amort','restr','impact','cov'].forEach(function(t){var b=document.getElementById('tb-'+t);b.style.display=cfg.t.indexOf(t)>=0?'flex':'none';b.classList.remove('on','busy');});
+  var iv=dealIRR(d),irrStr=iv?fPct1(iv.annIRR):'N/A';
+  var params=[{l:'Principal',v:fD(d.principal),c:'bl'},{l:'Outstanding',v:fD(d.outstanding||d.principal),c:''},{l:'Rate',v:fP(d.rate),c:''},{l:'EIR',v:'<span class="pmv irr-val" onclick="showIRRModal(getDeal(\''+id+'\'))">'+irrStr+' ℹ</span>',raw:true},{l:'IO months',v:d.io,c:''},{l:'Amort months',v:d.amort,c:''},{l:'Tenure',v:d.tenure+'mo',c:''},{l:'Orig fee',v:fP(d.orig_fee),c:''},{l:'EOT fee',v:fP(d.eot_fee),c:''},{l:'MOIC',v:iv?iv.MOIC.toFixed(2)+'x':'—',c:'gr'}];
+  if(d.pik_rate)params.push({l:'PIK',v:fP(d.pik_rate),c:'am'});
+  var pgH='<div class="pg4">'+params.map(function(p){return'<div class="pm"><div class="pml">'+p.l+'</div>'+(p.raw?'<div>'+p.v+'</div>':'<div class="pmv'+(p.c?' '+p.c:'')+'">'+p.v+'</div>')+'</div>';}).join('')+'</div>';
+  document.getElementById('content').innerHTML='<div style="overflow-y:auto;height:100%;padding:20px 24px">'
+    +'<div class="dtop"><div class="dico">'+cfg.i+'</div><div><div class="dname">'+hE(d.name)+'</div><div class="dmeta"><span class="dmi">'+cfg.l+'</span>'+(d.sector?'<span class="dsep">·</span><span class="dmi">'+hE(d.sector)+'</span>':'')+'<span class="dsep">·</span><span class="badge '+bdg+'">'+hE(stxt)+'</span></div></div></div>'
+    +'<div class="sh"><span class="sht">Deal parameters</span></div>'+pgH
+    +buildMonthlySchedule(d)
+    +'<div style="padding:7px 0;font-size:11px;color:var(--tx3);font-family:var(--mono)">Use analysis tools below for Claude AI-powered deep dives</div></div>';
+}
+
+// ── MONTHLY SCHEDULE ──
+function buildMonthlySchedule(d){
+  var start=d.origination||new Date();
+  var rows=[],bal=d.principal,P=d.principal,mr=d.rate/12,mpik=(d.pik_rate||0)/12,mp=d.amort>0?P/d.amort:0;
+  for(var m=1;m<=d.tenure;m++){
+    var pd=new Date(start);pd.setMonth(pd.getMonth()+m);pd.setHours(0,0,0,0);
+    var interest=bal*mr,pik=bal*mpik,prin=(m<=d.io)?0:mp;
+    if(m===d.tenure&&d.amort>0)prin=bal;
+    var eot=(m===d.tenure)?bal*(d.eot_fee||0):0,total=interest+prin+eot,cb=bal-prin+pik;
+    if(cb<0.01)cb=0;
+    var status=pd.getTime()===TODAY.getTime()?'today':(pd<TODAY?'paid':'pending');
+    rows.push({m:m,date:pd,phase:m<=d.io?'IO':'Amort'+(m===d.tenure?' (Final)':''),openBal:bal,interest:interest,prin:prin,eot:eot,total:total,closeBal:cb,status:status});
+    bal=cb;
+  }
+  var paidCnt=rows.filter(function(r){return r.status==='paid'}).length;
+  var pendCnt=rows.filter(function(r){return r.status==='pending'}).length;
+  var todayIdx=rows.reduce(function(acc,r,i){return(r.status==='today'||r.status==='paid')?i:acc;},-1);
+  var legH='<div class="sled"><div class="sledi"><div class="sleds" style="background:#d1fae5;border-left:3px solid var(--grn)"></div>Paid</div><div class="sledi"><div class="sleds" style="background:#eff6ff;border-left:3px solid var(--acc)"></div>Current</div><div class="sledi"><div class="sleds" style="background:#fff;border:1px solid var(--bdr)"></div>Pending</div></div>';
+  var sumH='<div style="display:flex;gap:10px;margin-bottom:7px"><span style="font-size:11px;color:var(--grn3);background:var(--grn2);padding:2px 9px;border-radius:5px;font-family:var(--mono)">✓ '+paidCnt+' paid</span><span style="font-size:11px;color:var(--nb6);background:var(--nb0);padding:2px 9px;border-radius:5px;font-family:var(--mono)">⏳ '+pendCnt+' pending</span></div>';
+  var wid='sw-'+d.id;
+  var tbl='<table class="atbl"><thead><tr><th>Mo.</th><th>Date</th><th>Phase</th><th>Opening bal.</th><th>Interest</th><th>Principal</th><th>Total payment</th><th>Closing bal.</th></tr></thead><tbody>'
+    +rows.map(function(r){var rc='row-'+r.status;var ds=r.date.toLocaleDateString('en-US',{month:'short',year:'numeric',day:'numeric'})+(r.status==='today'?' ◀':'');return'<tr class="'+rc+'" id="sr-'+r.m+'"><td>'+r.m+'</td><td>'+ds+'</td><td>'+r.phase+'</td><td>'+fD(r.openBal)+'</td><td>'+fD(r.interest)+'</td><td>'+(r.prin>0?fD(r.prin):'—')+'</td><td style="font-weight:600">'+fD(r.total)+'</td><td>'+fD(r.closeBal)+'</td></tr>';}).join('')
+    +'</tbody></table>';
+  setTimeout(function(){var w=document.getElementById(wid);if(!w)return;var t=todayIdx>=0?document.getElementById('sr-'+(todayIdx+1)):null;if(t){var off=t.offsetTop-w.offsetTop-60;if(off>0)w.scrollTop=off;}},200);
+  return'<div class="sh"><span class="sht">Monthly payment schedule</span><span class="shp">'+(d.amort>0?'IO '+d.io+'m + Amort '+d.amort+'m':'Bullet')+'</span></div>'+sumH+legH+'<div class="sched-wrap" id="'+wid+'">'+tbl+'</div>';
+}
+
+// ── CHARTS PAGE ──
+function destroyChart(id){if(_charts[id]){_charts[id].destroy();delete _charts[id];}}
+function showCharts(){
+  setActive('si-charts');setBc([{l:'Charts',fn:''}]);document.getElementById('tbar').classList.remove('show');closeChat();
+  if(!D.length){document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:var(--tx3)">Load portfolio data to view charts.</div>';return;}
+  document.getElementById('content').innerHTML='<div class="vpad"><div class="ptitle">Portfolio charts</div><div class="psub">Visual analytics across '+D.length+' deals</div>'
+    +'<div class="chart-grid">'
+    +'<div class="chart-card"><div class="ctit">IRR per deal</div><div style="position:relative;height:260px"><canvas id="ch-irr" role="img" aria-label="Bar chart of IRR per deal"></canvas></div></div>'
+    +'<div class="chart-card"><div class="ctit">Portfolio allocation by principal</div><div style="position:relative;height:260px"><canvas id="ch-pie" role="img" aria-label="Pie chart of portfolio allocation"></canvas></div></div>'
+    +'<div class="chart-card full"><div class="ctit">Cash flow waterfall — monthly interest income</div><div style="position:relative;height:220px"><canvas id="ch-cf" role="img" aria-label="Bar chart of monthly cash flows"></canvas></div></div>'
+    +'<div class="chart-card"><div class="ctit">Principal by instrument type</div><div style="position:relative;height:220px"><canvas id="ch-inst" role="img" aria-label="Bar chart of principal by instrument"></canvas></div></div>'
+    +'<div class="chart-card"><div class="ctit">Covenant status distribution</div><div style="position:relative;height:220px"><canvas id="ch-cov" role="img" aria-label="Doughnut chart of covenant status"></canvas></div></div>'
+    +'</div></div>';
+  setTimeout(renderCharts,50);
+}
+function renderCharts(){
+  var pal=['#1e3f7a','#2756a3','#3d72c8','#6696db','#9bbae8','#cddaf4','#10b981','#f59e0b','#ef4444','#7c3aed','#0891b2','#e879f9'];
+  // IRR per deal
+  destroyChart('irr');
+  var irrLabels=D.map(function(d){return d.name.length>14?d.name.slice(0,13)+'…':d.name;});
+  var irrVals=D.map(function(d){var r=dealIRR(d);return r?parseFloat((r.annIRR*100).toFixed(1)):0;});
+  var irrColors=irrVals.map(function(v){return v>=18?'#065f46':v>=14?'#1e3f7a':'#92400e';});
+  _charts['irr']=new Chart(document.getElementById('ch-irr'),{type:'bar',data:{labels:irrLabels,datasets:[{label:'EIR %',data:irrVals,backgroundColor:irrColors,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y.toFixed(1)+'%';}}}},scales:{y:{ticks:{callback:function(v){return v+'%';}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{autoSkip:false,maxRotation:40,font:{size:10}}}}}});
+  // Pie allocation
+  destroyChart('pie');
+  var pieLabels=D.map(function(d){return d.name.length>12?d.name.slice(0,11)+'…':d.name;});
+  var pieVals=D.map(function(d){return Math.round(d.principal);});
+  _charts['pie']=new Chart(document.getElementById('ch-pie'),{type:'doughnut',data:{labels:pieLabels,datasets:[{data:pieVals,backgroundColor:D.map(function(_,i){return pal[i%pal.length];}),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:10,padding:8}},tooltip:{callbacks:{label:function(c){var pct=(c.parsed/pieVals.reduce(function(a,b){return a+b;},0)*100).toFixed(1);return c.label+': $'+c.parsed.toLocaleString()+' ('+pct+'%)';}}}}}});
+  // CF waterfall — monthly interest by deal for first 12 months
+  destroyChart('cf');
+  var months=Array.from({length:12},function(_,i){return'Mo.'+(i+1);});
+  var cfDatasets=D.slice(0,6).map(function(d,i){
+    var vals=[];var bal=d.principal,mr=d.rate/12,mp=d.amort>0?d.principal/d.amort:0;
+    for(var m=1;m<=12;m++){vals.push(parseFloat((bal*mr).toFixed(0)));var pr=(m<=d.io)?0:mp;bal-=pr;if(bal<0)bal=0;}
+    return{label:d.name.length>12?d.name.slice(0,11)+'…':d.name,data:vals,backgroundColor:pal[i%pal.length],borderRadius:2};
+  });
+  _charts['cf']=new Chart(document.getElementById('ch-cf'),{type:'bar',data:{labels:months,datasets:cfDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:8}}},scales:{x:{stacked:true,ticks:{autoSkip:false}},y:{stacked:true,ticks:{callback:function(v){return'$'+v.toLocaleString();}},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+  // Instrument bar
+  destroyChart('inst');
+  var instMap={};D.forEach(function(d){var l=gc(d).l;instMap[l]=(instMap[l]||0)+d.principal;});
+  var instK=Object.keys(instMap),instV=instK.map(function(k){return Math.round(instMap[k]);});
+  _charts['inst']=new Chart(document.getElementById('ch-inst'),{type:'bar',data:{labels:instK,datasets:[{label:'Principal',data:instV,backgroundColor:pal.slice(0,instK.length),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'$'+c.parsed.x.toLocaleString();}}}},scales:{x:{ticks:{callback:function(v){return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v;}},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{font:{size:10}}}}}});
+  // Covenant doughnut
+  destroyChart('cov');
+  var nCC=D.filter(function(d){return d.status==='compliant';}).length;
+  var nM=D.filter(function(d){return d.status==='monitoring';}).length;
+  var nB=D.filter(function(d){return d.status==='breach risk';}).length;
+  _charts['cov']=new Chart(document.getElementById('ch-cov'),{type:'doughnut',data:{labels:['Compliant ('+nCC+')','Monitoring ('+nM+')','Breach ('+nB+')'],datasets:[{data:[nCC,nM,nB],backgroundColor:['#10b981','#f59e0b','#ef4444'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}}}}});
+}
+
+// ── SCENARIO COMPARISON ──
+function showScenario(){
+  setActive('si-scenario');setBc([{l:'Scenario comparison',fn:''}]);document.getElementById('tbar').classList.remove('show');closeChat();
+  if(!D.length){document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:var(--tx3)">Load portfolio data first.</div>';return;}
+  var d=D[0];
+  renderScenario(d);
+}
+function renderScenario(d){
+  if(!d){document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:var(--tx3)">Select a deal.</div>';return;}
+  var iv=dealIRR(d);
+  var baseIRR=iv?iv.annIRR:0;
+  // Pre-defined scenarios
+  var scenarios=[
+    {id:'base',label:'Base case',badge:'base',rate:d.rate,tenure:d.tenure,io:d.io,origFee:d.orig_fee,eotFee:d.eot_fee,pik:d.pik_rate||0},
+    {id:'ext6',label:'Maturity +6mo',badge:'cust',rate:d.rate,tenure:d.tenure+6,io:d.io,origFee:d.orig_fee,eotFee:d.eot_fee,pik:d.pik_rate||0},
+    {id:'rateup',label:'Rate +150bps',badge:'best',rate:d.rate+0.015,tenure:d.tenure,io:d.io,origFee:d.orig_fee,eotFee:d.eot_fee,pik:d.pik_rate||0},
+    {id:'pik',label:'PIK +5% toggle',badge:'cust',rate:d.rate,tenure:d.tenure,io:d.io,origFee:d.orig_fee,eotFee:d.eot_fee,pik:(d.pik_rate||0)+0.05},
+    {id:'ratedn',label:'Rate -100bps',badge:'worst',rate:Math.max(d.rate-0.01,0.04),tenure:d.tenure,io:d.io,origFee:d.orig_fee,eotFee:d.eot_fee,pik:d.pik_rate||0},
+    {id:'ext12',label:'Maturity +12mo',badge:'cust',rate:d.rate,tenure:d.tenure+12,io:d.io,origFee:d.orig_fee,eotFee:d.eot_fee+0.01,pik:d.pik_rate||0},
+    {id:'covwv',label:'Cov waiver +2%',badge:'cust',rate:d.rate+0.02,tenure:d.tenure,io:d.io,origFee:d.orig_fee+0.015,eotFee:d.eot_fee,pik:d.pik_rate||0},
+    {id:'distress',label:'Distressed restr.',badge:'worst',rate:d.rate-0.02,tenure:d.tenure+18,io:d.tenure+6,origFee:d.orig_fee,eotFee:d.eot_fee+0.02,pik:(d.pik_rate||0)+0.03}
+  ];
+  function scIRR(sc){var dd={principal:d.principal,rate:sc.rate,io:sc.io,amort:sc.tenure-sc.io,tenure:sc.tenure,orig_fee:sc.origFee,eot_fee:sc.eotFee,pik_rate:sc.pik};var r=dealIRR(dd);return r?r.annIRR:0;}
+  var scIRRs=scenarios.map(function(sc){return{sc:sc,irr:scIRR(sc)};});
+  // Deal selector
+  var dealOpts=D.map(function(dd){return'<option value="'+dd.id+'"'+(dd.id===d.id?' selected':'')+'>'+hE(dd.name)+'</option>';}).join('');
+  var selH='<div class="sc-controls"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:12px;font-weight:500;color:var(--tx)">Deal:</div><select id="sc-deal-sel" style="padding:5px 10px;border:1px solid var(--bdr2);border-radius:5px;font-size:12px;font-family:var(--font);color:var(--tx);background:var(--s2);outline:none" onchange="renderScenario(getDeal(this.value))">'+dealOpts+'</select><span style="font-size:11px;color:var(--tx3);font-family:var(--mono)">Base EIR: <strong style="color:var(--nb6)">'+fPct1(baseIRR)+'</strong> &nbsp;·&nbsp; Principal: <strong>'+fD(d.principal)+'</strong> &nbsp;·&nbsp; Tenure: <strong>'+d.tenure+'mo</strong></span></div>'
+    +'<div style="font-size:10.5px;font-weight:600;color:var(--tx3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">Custom scenario</div>'
+    +'<div class="sc-row">'
+    +'<div class="sc-field"><div class="sc-lbl">Rate (%)</div><input class="sc-inp" id="sc-rate" type="number" step="0.1" value="'+(d.rate*100).toFixed(2)+'"></div>'
+    +'<div class="sc-field"><div class="sc-lbl">Tenure (mo)</div><input class="sc-inp" id="sc-tenure" type="number" value="'+d.tenure+'"></div>'
+    +'<div class="sc-field"><div class="sc-lbl">Orig fee (%)</div><input class="sc-inp" id="sc-origfee" type="number" step="0.1" value="'+(d.orig_fee*100).toFixed(2)+'"></div>'
+    +'<div class="sc-field"><div class="sc-lbl">EOT fee (%)</div><input class="sc-inp" id="sc-eotfee" type="number" step="0.1" value="'+(d.eot_fee*100).toFixed(2)+'"></div>'
+    +'</div>'
+    +'<div class="sc-row" style="margin-top:-6px">'
+    +'<div class="sc-field"><div class="sc-lbl">IO months</div><input class="sc-inp" id="sc-io" type="number" value="'+d.io+'"></div>'
+    +'<div class="sc-field"><div class="sc-lbl">PIK rate (%)</div><input class="sc-inp" id="sc-pik" type="number" step="0.1" value="'+((d.pik_rate||0)*100).toFixed(2)+'"></div>'
+    +'<div class="sc-field" style="grid-column:span 2;justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:8px"><button class="btn pri" onclick="addCustomScenario()">Add custom scenario</button><button class="btn" onclick="askAIScenario()">&#9654; Ask Claude AI</button></div>'
+    +'</div></div>';
+  // Scenario cards
+  var badgeMap={base:'base',best:'best',worst:'worst',cust:'cust'};
+  var cards=scIRRs.map(function(si){
+    var sc=si.sc,irr=si.irr,delta=irr-baseIRR;
+    var deltaStr=(delta>0?'+':'')+fPct1(delta);
+    var deltaClass=delta>0.001?'pos':delta<-0.001?'neg':'ne';
+    var irrClass=irr>baseIRR?'up':irr<baseIRR?'dn':'';
+    return'<div class="sc-card '+(sc.badge==='best'?'best':sc.badge==='worst'?'worst':sc.id==='base'?'base':'')+'">'
+      +'<div class="sc-badge '+sc.badge+'">'+sc.label+'</div>'
+      +'<div class="sc-irr '+irrClass+'">'+fPct1(irr)+'</div>'
+      +'<div class="sc-delta '+deltaClass+'">'+deltaStr+' vs base</div>'
+      +'<div class="sc-rows">'
+      +'<div class="sc-r"><span>Rate</span><span class="sc-rv">'+fP(sc.rate)+'</span></div>'
+      +'<div class="sc-r"><span>Tenure</span><span class="sc-rv">'+sc.tenure+'mo</span></div>'
+      +'<div class="sc-r"><span>IO</span><span class="sc-rv">'+sc.io+'mo</span></div>'
+      +'<div class="sc-r"><span>Orig fee</span><span class="sc-rv">'+fP(sc.origFee)+'</span></div>'
+      +'<div class="sc-r"><span>EOT fee</span><span class="sc-rv">'+fP(sc.eotFee)+'</span></div>'
+      +(sc.pik?'<div class="sc-r"><span>PIK</span><span class="sc-rv">'+fP(sc.pik)+'</span></div>':'')
+      +'</div></div>';
+  }).join('');
+  // Chart
+  var chartH='<div class="card" style="margin-bottom:14px"><div class="ctit">IRR comparison across scenarios</div><div class="sc-chart-wrap"><canvas id="sc-chart" role="img" aria-label="Bar chart comparing IRR across restructure scenarios"></canvas></div></div>';
+  document.getElementById('content').innerHTML='<div class="vpad"><div class="ptitle">Scenario comparison</div><div class="psub">Side-by-side IRR view across restructure options</div>'
+    +selH+'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">'+cards+'</div>'+chartH+'</div>';
+  setTimeout(function(){
+    destroyChart('sc');
+    var scLabels=scIRRs.map(function(si){return si.sc.label;});
+    var scVals=scIRRs.map(function(si){return parseFloat((si.irr*100).toFixed(2));});
+    var scColors=scIRRs.map(function(si){return si.sc.id==='base'?'#1e3f7a':si.irr>baseIRR?'#065f46':'#991b1b';});
+    _charts['sc']=new Chart(document.getElementById('sc-chart'),{type:'bar',data:{labels:scLabels,datasets:[{label:'EIR %',data:scVals,backgroundColor:scColors,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y.toFixed(2)+'%';}}}},scales:{y:{ticks:{callback:function(v){return v.toFixed(1)+'%';}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10},autoSkip:false}}}}});
+  },60);
+}
+function addCustomScenario(){
+  var d=CD||D[0];if(!d)return;
+  var rate=parseFloat(document.getElementById('sc-rate').value||d.rate*100)/100;
+  var tenure=parseInt(document.getElementById('sc-tenure').value||d.tenure);
+  var io=parseInt(document.getElementById('sc-io').value||d.io);
+  var of=parseFloat(document.getElementById('sc-origfee').value||d.orig_fee*100)/100;
+  var ef=parseFloat(document.getElementById('sc-eotfee').value||d.eot_fee*100)/100;
+  var pik=parseFloat(document.getElementById('sc-pik').value||0)/100;
+  var dd={principal:d.principal,rate:rate,io:io,amort:tenure-io,tenure:tenure,orig_fee:of,eot_fee:ef,pik_rate:pik};
+  var r=dealIRR(dd),baseR=dealIRR(d);
+  var irrStr=r?fPct1(r.annIRR):'N/A',delta=r&&baseR?r.annIRR-baseR.annIRR:null;
+  alert('Custom scenario EIR: '+irrStr+(delta!==null?'\nDelta vs base: '+(delta>0?'+':'')+fPct1(delta):''));
+}
+function askAIScenario(){
+  var d=CD||D[0];if(!d)return;
+  document.getElementById('chat').classList.add('open');
+  document.getElementById('chtitle').textContent='Scenario analysis';
+  CH=[];CT='restr';
+  var prompt='Analyse restructure scenarios for '+d.name+' ('+d.instrument_type+', '+fD(d.principal)+' at '+fP(d.rate)+', IO '+d.io+'mo, tenure '+d.tenure+'mo).\n\nCompare: (1) base case, (2) maturity extension +6mo, (3) rate step-up +150bps, (4) covenant waiver with 2% fee, (5) distressed restructure. For each scenario: state the EIR change in bps, MOIC impact, lender recommendation. Use an HTML table for the comparison.';
+  callAI(prompt,'restr',null);
+}
+
+// ── COVENANT TRACKER ──
+function showCovenant(){
+  setActive('si-cov');setBc([{l:'Covenant tracker',fn:''}]);document.getElementById('tbar').classList.remove('show');closeChat();
+  if(!D.length){document.getElementById('content').innerHTML='<div style="padding:40px;text-align:center;color:var(--tx3)">Load portfolio data first.</div>';return;}
+  renderCovenantPage();
+}
+function renderCovenantPage(){
+  var breach=D.filter(function(d){return d.status==='breach risk';});
+  var watch=D.filter(function(d){return d.status==='monitoring';});
+  var ok=D.filter(function(d){return d.status==='compliant';});
+  var summaryH='<div class="krow" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">'
+    +'<div class="kpi re"><div class="kl">Breach risk</div><div class="kv" style="color:var(--red)">'+breach.length+'</div><div class="ks dn">Immediate attention</div></div>'
+    +'<div class="kpi am"><div class="kl">Monitoring</div><div class="kv" style="color:var(--amb)">'+watch.length+'</div><div class="ks ne">Close watch</div></div>'
+    +'<div class="kpi gr"><div class="kl">Compliant</div><div class="kv" style="color:var(--grn)">'+ok.length+'</div><div class="ks up">Within thresholds</div></div>'
+    +'</div>';
+  // Covenant cards for each deal
+  var covDefs={
+    'term loan':['Min. liquidity ratio','Min. revenue growth','Max. leverage (D/E)','Min. DSCR'],
+    'secured tl':['Min. liquidity ratio','Min. revenue growth','Max. leverage (D/E)','Min. DSCR'],
+    'bridge loan':['Max. LTV','Min. liquidity','Exit event milestone'],
+    'conv. note':['Min. revenue','Qualified financing trigger','Conversion floor'],
+    'rev. note':['Min. MRR','Min. revenue growth','Max. customer churn'],
+    'note':['Min. liquidity ratio','Max. leverage','Min. DSCR'],
+    'warrant':['Exercise price threshold','Expiry date']
+  };
+  var statusColor={compliant:'ok',monitoring:'watch','breach risk':'breach'};
+  var covCards=D.map(function(d){
+    var sc=statusColor[d.status]||'ok';
+    var cfg=gc(d);
+    var covenants=covDefs[cfg.l.toLowerCase()]||covDefs['term loan'];
+    // Synthesise threshold values for demo (real file would have these)
+    var saved=COV_THRESHOLDS[d.id]||{};
+    var thresholdH=covenants.map(function(cov,ci){
+      var key=d.id+'_'+ci;
+      var current=saved[key];
+      // Simulate current value based on status
+      var pct=d.status==='compliant'?75+Math.random()*20:d.status==='monitoring'?45+Math.random()*20:15+Math.random()*25;
+      pct=Math.min(100,Math.round(pct));
+      var barColor=pct>60?'var(--grn)':pct>35?'var(--amb)':'var(--red)';
+      return'<div class="cov-metric">'
+        +'<div class="cov-ml">'+cov+'</div>'
+        +'<div class="cov-bar-wrap"><div class="cov-bar" style="width:'+pct+'%;background:'+barColor+'"></div></div>'
+        +'<div class="cov-vals"><span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Current: '+pct+'%</span>'
+        +'<input class="cov-ti" style="font-size:10px;font-family:var(--mono);border:none;background:transparent;width:80px;color:var(--tx3);text-align:right" placeholder="Threshold..." value="'+(current||'')+'" onchange="saveCovThreshold(\''+d.id+'\','+ci+',this.value)" title="Set threshold"></div></div>';
+    }).join('');
+    var action=d.status==='breach risk'?'⚠ Initiate waiver negotiation. Request audited financials within 5 business days. Escalate to credit committee.'
+      :d.status==='monitoring'?'👁 Increase reporting frequency to bi-weekly. Request management commentary on revenue trajectory.'
+      :'✓ Standard quarterly monitoring. Next covenant test: '+new Date(TODAY.getTime()+90*24*3600*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'.';
+    return'<div class="cov-card '+sc+'">'
+      +'<div class="cov-tag '+sc+'">'+ST[d.status]+'</div>'
+      +'<div class="cov-deal">'+hE(d.name)+'</div>'
+      +'<div class="cov-type">'+cfg.l+(d.sector?' · '+hE(d.sector):'')+'</div>'
+      +thresholdH
+      +'<div class="cov-action">'+action+'</div>'
+      +'</div>';
+  }).join('');
+  // Full covenant table
+  var tblH='<div class="sh" style="margin-bottom:10px"><span class="sht">All covenants — summary table</span><button class="btn sm" style="margin-left:auto" onclick="runCovenantAI()">&#9654; AI covenant review</button></div>'
+    +'<table class="cov-table"><thead><tr><th>Deal</th><th>Type</th><th>Status</th><th>Key covenants</th><th>Recommended action</th></tr></thead><tbody>'
+    +D.map(function(d){
+      var sc=statusColor[d.status]||'ok';
+      var cfg=gc(d),covs=(covDefs[cfg.l.toLowerCase()]||covDefs['term loan']).slice(0,3).join(', ');
+      var action=d.status==='breach risk'?'Initiate waiver · Escalate to committee':d.status==='monitoring'?'Increase monitoring frequency':'Standard quarterly review';
+      return'<tr><td style="font-weight:500">'+hE(d.name)+'</td><td><span class="rtag">'+cfg.l+'</span></td><td><span class="badge '+(SB[d.status]||'bb')+'">'+ST[d.status]+'</span></td><td style="font-size:11px;color:var(--tx2)">'+covs+'</td><td style="font-size:11px;color:var(--tx2)">'+action+'</td></tr>';
+    }).join('')+'</tbody></table>';
+  document.getElementById('content').innerHTML='<div class="vpad"><div class="ptitle">Covenant tracker</div><div class="psub">Threshold monitoring &amp; breach alerts across '+D.length+' deals</div>'
+    +summaryH
+    +'<div class="cov-grid">'+covCards+'</div>'
+    +tblH+'</div>';
+}
+function saveCovThreshold(dealId,covenantIdx,val){
+  if(!COV_THRESHOLDS[dealId])COV_THRESHOLDS[dealId]={};
+  COV_THRESHOLDS[dealId][dealId+'_'+covenantIdx]=val;
+}
+function runCovenantAI(){
+  document.getElementById('chat').classList.add('open');
+  document.getElementById('chtitle').textContent='Covenant review';
+  CH=[];CT='cov';
+  var breachDeals=D.filter(function(d){return d.status==='breach risk';}).map(function(d){return d.name;});
+  var watchDeals=D.filter(function(d){return d.status==='monitoring';}).map(function(d){return d.name;});
+  var prompt='Perform a covenant review for the following portfolio:\n\nBreach risk deals: '+(breachDeals.join(', ')||'none')+'\nMonitoring deals: '+(watchDeals.join(', ')||'none')+'\nCompliant deals: '+D.filter(function(d){return d.status==='compliant';}).length+'\n\nFor each breach-risk deal, recommend: (1) waiver strategy, (2) required documentation, (3) fee structure for waiver, (4) credit committee escalation steps. For monitoring deals: (1) enhanced reporting requirements, (2) cure period approach. Use HTML tables.';
+  callAI(prompt,'cov',null);
+}
+
+// ── TOOLS ──
+function openTool(tool){
+  if(!CD)return;CT=tool;CH=[];
+  document.getElementById('chat').classList.add('open');
+  ['irr','amort','restr','impact','cov'].forEach(function(t){var b=document.getElementById('tb-'+t);if(b)b.classList.toggle('on',t===tool);});
+  document.getElementById('msgs').innerHTML='';
+  var titles={irr:'IRR Calculation',amort:'Amortization Schedule',restr:'Restructure Scenario',impact:'IRR Impact Analysis',cov:'Covenant Check'};
+  document.getElementById('chtitle').textContent=titles[tool]||tool;
+  var d=CD,op={irr:{m:'Running IRR for <strong>'+hE(d.name)+'</strong>…',c:['Fee decomp','Sensitivity ±1%','Benchmark compare'],auto:true},amort:{m:'Generating schedule for <strong>'+hE(d.name)+'</strong>…',c:['Milestone months','Early repay month 18','PIK effect'],auto:true},restr:{m:'Restructure for <strong>'+hE(d.name)+'</strong> — choose:',c:['Extend +6mo','Rate +150bps','Covenant waiver','PIK toggle 12mo'],auto:false},impact:{m:'IRR impact for <strong>'+hE(d.name)+'</strong>:',c:['Extension +9mo','Rate +200bps','Covenant waiver'],auto:false},cov:{m:'Covenant analysis for <strong>'+hE(d.name)+'</strong>…',c:['All covenants','Breach steps','Waiver approach'],auto:true}};
+  var o=op[tool];if(!o)return;
+  addAI(o.m,o.c);
+  if(o.auto)setTimeout(function(){autoRun(tool);},300);
+}
+function autoRun(tool){
+  var d=CD;if(!d)return;
+  var iv=dealIRR(d);
+  var p={
+    irr:'Calculate the all-in IRR for:\n- Deal: '+d.name+' ('+d.instrument_type+')\n- Principal: '+fD(d.principal)+'\n- Rate: '+fP(d.rate)+'\n- IO: '+d.io+'mo, Amort: '+d.amort+'mo, Tenure: '+d.tenure+'mo\n- Orig fee: '+fP(d.orig_fee)+', EOT fee: '+fP(d.eot_fee)+(d.pik_rate?', PIK: '+fP(d.pik_rate):'')+'\nPre-computed EIR: '+(iv?fPct1(iv.annIRR):'N/A')+', MOIC: '+(iv?iv.MOIC.toFixed(2)+'x':'N/A')+'\n\nConfirm EIR and provide: (1) All-in EIR, (2) MOIC, (3) Total income, (4) Fee decomp in bps HTML table.',
+    amort:'Month-by-month amortization schedule:\n- Principal: '+fD(d.principal)+', Rate: '+fP(d.rate)+'\n- IO: '+d.io+'mo, Amort: '+d.amort+'mo'+(d.pik_rate?', PIK: '+fP(d.pik_rate):'')+'\nHTML table: Month|Phase|Opening Bal|Interest|Principal|Closing Bal. Show every month up to 36, else every 3rd + final.',
+    cov:'Covenant analysis for '+d.name+' ('+d.instrument_type+', '+fD(d.principal)+' at '+fP(d.rate)+', sector: '+(d.sector||'N/A')+', status: '+d.status+').\n\nProvide: (1) typical covenants, (2) status assessment, (3) recommended actions. HTML table for covenant list.'
+  };
+  if(p[tool])callAI(p[tool],tool,null);
+}
+function sendMsg(prefill){
+  var ta=document.getElementById('cta');
+  var text=prefill||ta.value.trim();if(!text)return;
+  if(!prefill){ta.value='';ar(ta);}
+  addUser(text);CH.push({role:'user',content:text});
+  var d=CD,ctx=d?'Deal: '+d.name+' ('+d.instrument_type+'), '+fD(d.principal)+' at '+fP(d.rate)+', IO='+d.io+'mo, amort='+d.amort+'mo, origFee='+fP(d.orig_fee)+', eotFee='+fP(d.eot_fee)+(d.pik_rate?', pik='+fP(d.pik_rate):''):'';
+  callAI(text,CT,null,ctx);
+}
+function callAI(prompt,tool,cb,extraCtx){
+  var d=CD;
+  var sys='You are a private credit analyst specialising in venture debt. Precise, quantitative. Use <strong> for key figures. HTML <table> tags for tables. No markdown, no asterisks. Use <br> for line breaks.'+(d?' Deal: '+d.name+' ('+d.instrument_type+'), '+fD(d.principal)+' at '+fP(d.rate)+', IO '+d.io+'mo, amort '+d.amort+'mo, origFee '+fP(d.orig_fee)+', eotFee '+fP(d.eot_fee)+(d.pik_rate?', PIK '+fP(d.pik_rate):'')+'.':(extraCtx||''));
+  var messages=CH.slice(-6);
+  if(!messages.length||messages[messages.length-1].role!=='user')messages=messages.concat([{role:'user',content:prompt}]);
+  var lid=addLoading();
+  document.getElementById('chspin').style.display='block';
+  if(tool){var b=document.getElementById('tb-'+tool);if(b)b.classList.add('busy');}
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,system:sys,messages:messages})})
+  .then(function(r){return r.json();})
+  .then(function(data){
+    rmMsg(lid);document.getElementById('chspin').style.display='none';
+    if(tool){var b=document.getElementById('tb-'+tool);if(b)b.classList.remove('busy');}
+    if(data.error){addAI('Error: '+hE(data.error.message||''),[]);return;}
+    var txt='';(data.content||[]).forEach(function(c){if(c.type==='text')txt+=c.text;});
+    if(!txt){addAI('No response.',[]);return;}
+    CH.push({role:'assistant',content:txt});
+    var html=txt.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    addAI(html,getChips(tool));if(cb)cb();
+  })
+  .catch(function(err){rmMsg(lid);document.getElementById('chspin').style.display='none';if(tool){var b=document.getElementById('tb-'+tool);if(b)b.classList.remove('busy');}addAI('<strong>Connection error:</strong> '+hE(err.message),[]);if(cb)cb();});
+}
+function getChips(tool){return({irr:['Fee decomp','Sensitivity','MOIC'],amort:['Early repay','Rate change','Add PIK'],restr:['Compare all','IRR impact','Memo'],impact:['Extension','Rate step-up'],cov:['Breach remediation','Waiver']})[tool]||[];}
+function runPortfolioAnalysis(){
+  document.getElementById('chat').classList.add('open');document.getElementById('chtitle').textContent='Portfolio analysis';CH=[];CT='portfolio';
+  var pIRR=portfolioIRR();
+  callAI('Analyse this portfolio:\nWeighted IRR: '+(pIRR?fPct1(pIRR):'N/A')+'\n'+D.map(function(d,i){var iv=dealIRR(d);return(i+1)+'. '+d.name+' ('+gc(d).l+'): '+fD(d.principal)+', rate '+fP(d.rate)+', EIR '+(iv?fPct1(iv.annIRR):'N/A')+', status: '+d.status;}).join('\n')+'\n\nProvide: total annual income, fee income, key risks, top 3 recommendations. HTML tables. Bold key numbers.','portfolio',null);
+}
+function addUser(txt){var m=document.getElementById('msgs'),el=document.createElement('div');el.className='msg u';el.innerHTML='<div class="av u">You</div><div class="bbl u">'+hE(txt)+'</div>';m.appendChild(el);m.scrollTop=m.scrollHeight;}
+function addAI(html,chips){chips=chips||[];var m=document.getElementById('msgs'),el=document.createElement('div');el.className='msg';var ch=chips.length?'<div class="chips">'+chips.map(function(c){return'<span class="chip" onclick="sendMsg(\''+c.replace(/'/g,"\\'")+'\')">'+ hE(c)+'</span>';}).join('')+'</div>':'';el.innerHTML='<div class="av ai">N</div><div class="bbl ai">'+html+ch+'</div>';m.appendChild(el);m.scrollTop=m.scrollHeight;}
+function addLoading(){var m=document.getElementById('msgs'),id='ld'+Date.now(),el=document.createElement('div');el.className='msg';el.id=id;el.innerHTML='<div class="av ai">N</div><div class="bbl ai"><div class="ldots"><span></span><span></span><span></span></div></div>';m.appendChild(el);m.scrollTop=m.scrollHeight;return id;}
+function rmMsg(id){var e=document.getElementById(id);if(e&&e.parentNode)e.parentNode.removeChild(e);}
+function closeChat(){document.getElementById('chat').classList.remove('open');document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on','busy');});}
+</script>
+</body>
+</html>

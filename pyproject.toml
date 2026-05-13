@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "private-credit-mcp"
+version = "1.0.0"
+description = "Private credit analytics API (FastAPI + LangChain) with MongoDB-backed tools"
+readme = "PRIVATE_CREDIT_MCP_EXPLAINED.md"
+requires-python = ">=3.11"
+dependencies = [
+  "langchain-core>=1.3.0",
+  "pydantic>=2.0",
+  "pymongo>=4.6",
+  "python-dotenv>=1.0",
+  "starlette>=0.52,<1",
+  "python-multipart>=0.0.18",
+  "fastapi>=0.130",
+  "uvicorn[standard]>=0.30",
+  "langchain>=0.3.0",
+  "langchain-anthropic>=0.3.0",
+  "langchain-openai>=0.3.0",
+  "langchain-google-genai>=2.1.0",
+  "langchain-groq>=0.2.0",
+  "langgraph>=0.2.0",
+  "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[project.scripts]
+private-credit-seed = "private_credit_mcp.seed_mongo:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["private_credit_mcp*"]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.package-data]
+private_credit_mcp = ["py.typed", "templates/term_sheet.txt", "data/seed_deals.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["integration: tests requiring MONGODB_URI"]
+# LangChain imports pydantic.v1 shims; Pydantic warns on Python 3.14 until upstream drops v1 imports.
+filterwarnings = [
+  "ignore:.*Pydantic V1 functionality.*Python 3\\.14.*:UserWarning:langchain_core._api.deprecation",
+]

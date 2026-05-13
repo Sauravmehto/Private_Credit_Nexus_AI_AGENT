@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VentureDebt AI — Nexus Fund I</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nb:#050d1a;--nb9:#0a1628;--nb8:#0f2044;--nb7:#162d5e;--nb6:#1e3f7a;
+  --nb5:#2756a3;--nb4:#3d72c8;--nb3:#6696db;--nb2:#9bbae8;--nb1:#cddaf4;--nb0:#eaf0fb;
+  --acc:#4f9cf9;--acc2:#2d7ef5;
+  --s:#fff;--s2:#f7f8fa;--s3:#eef0f4;--s4:#e4e8ef;
+  --bdr:#e2e6ed;--bdr2:#d0d5df;
+  --tx:#0d1117;--tx2:#4b5563;--tx3:#9ca3af;
+  --grn:#10b981;--grn2:#d1fae5;--grn3:#065f46;
+  --amb:#f59e0b;--amb2:#fef3c7;--amb3:#92400e;
+  --red:#ef4444;--red2:#fee2e2;--red3:#991b1b;
+  --blu:#3b82f6;--blu2:#dbeafe;--blu3:#1e40af;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --r:10px;--rs:6px;--rl:14px;
+}
+html,body{height:100%;overflow:hidden;background:var(--nb);font-family:var(--font)}
+
+/* ── LAYOUT ── */
+#app{display:flex;height:100vh}
+
+/* ── SIDEBAR ── */
+#sb{
+  width:230px;flex-shrink:0;
+  background:linear-gradient(175deg,var(--nb9) 0%,var(--nb) 100%);
+  border-right:1px solid rgba(255,255,255,0.06);
+  display:flex;flex-direction:column;position:relative;overflow:hidden;
+}
+#sb::before{content:'';position:absolute;top:-50px;right:-30px;width:160px;height:160px;
+  background:radial-gradient(circle,rgba(79,156,249,0.14) 0%,transparent 70%);pointer-events:none}
+
+.sb-head{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sb-brand{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.sb-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--acc),var(--nb4));
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 10px rgba(79,156,249,0.45)}
+.sb-icon svg{width:15px;height:15px;fill:white}
+.sb-name{font-size:13.5px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:var(--nb3);padding-left:37px;letter-spacing:.02em}
+
+.sb-sect{padding:13px 16px 4px;font-size:9px;font-weight:600;
+  color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:.1em}
+
+.sb-nav{padding:0 7px}
+.sbi{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--rs);
+  cursor:pointer;color:rgba(255,255,255,0.5);font-size:12.5px;transition:all .15s;
+  margin-bottom:1px;position:relative;border:1px solid transparent}
+.sbi:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.sbi.active{color:#fff;background:rgba(79,156,249,0.14);border-color:rgba(79,156,249,0.24)}
+.sbi.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:55%;background:var(--acc);border-radius:0 3px 3px 0}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-blue{background:#4f9cf9}.d-teal{background:#2dd4bf}.d-amb{background:#fbbf24}
+.d-coral{background:#fb7185}.d-purple{background:#a78bfa}.d-gray{background:rgba(255,255,255,0.28)}
+.d-grn{background:#34d399}
+
+.sb-hr{margin:7px 14px;border:none;border-top:1px solid rgba(255,255,255,0.07)}
+
+/* deal list in sidebar */
+.deal-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:var(--rs);
+  cursor:pointer;color:rgba(255,255,255,0.4);font-size:11.5px;transition:all .15s;margin:0 7px 1px}
+.deal-item:hover{color:rgba(255,255,255,.75);background:rgba(255,255,255,0.05)}
+.di-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+.sb-foot{margin-top:auto;padding:10px 11px 12px;border-top:1px solid rgba(255,255,255,0.07)}
+.sb-role-lbl{font-size:9px;color:rgba(255,255,255,0.28);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:5px;padding-left:2px}
+.role-sel{width:100%;padding:5px 9px;font-size:12px;font-family:var(--font);
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--rs);color:rgba(255,255,255,0.8);cursor:pointer;outline:none}
+.role-sel option{background:#0f2044;color:#fff}
+.mcp-pill{display:flex;align-items:center;gap:6px;margin-top:7px;
+  padding:6px 9px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);
+  border-radius:var(--rs);font-size:11px;color:#34d399}
+.mcp-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);
+  box-shadow:0 0 5px var(--grn);animation:pg 2s infinite}
+@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── MAIN AREA ── */
+#main{flex:1;display:flex;flex-direction:column;background:var(--s);min-width:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{height:52px;background:var(--s);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0}
+.tb-title{font-size:14px;font-weight:600;color:var(--tx);flex:1}
+.tb-sub{font-size:11px;color:var(--tx3)}
+.tb-btn{padding:5px 11px;font-size:12px;font-family:var(--font);border:1px solid var(--bdr2);
+  border-radius:var(--rs);background:var(--s2);color:var(--tx2);cursor:pointer;transition:all .12s}
+.tb-btn:hover{background:var(--s3);border-color:var(--nb3);color:var(--nb6)}
+.tb-btn.pri{background:var(--nb7);color:#fff;border-color:var(--nb7)}
+.tb-btn.pri:hover{background:var(--nb8)}
+
+/* ── PAGE CONTAINER ── */
+#page{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── TABS ── */
+#tabs{display:flex;border-bottom:1px solid var(--bdr);background:var(--s2);flex-shrink:0}
+.tab{padding:10px 18px;font-size:13px;cursor:pointer;color:var(--tx3);
+  border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--tx2)}
+.tab.active{color:var(--nb7);border-bottom-color:var(--nb6);font-weight:500;background:var(--s)}
+
+/* ── VIEWS ── */
+.view{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.view.active{display:flex}
+.view::-webkit-scrollbar{width:4px}
+.view::-webkit-scrollbar-track{background:transparent}
+.view::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+
+/* ── PORTFOLIO VIEW ── */
+#v-portfolio{padding:20px;gap:16px}
+
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kpi{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;
+  position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.07)}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--r) var(--r)}
+.kpi.blue::after{background:linear-gradient(90deg,var(--nb6),var(--acc))}
+.kpi.green::after{background:linear-gradient(90deg,#059669,var(--grn))}
+.kpi.amber::after{background:linear-gradient(90deg,#d97706,var(--amb))}
+.kpi.red::after{background:linear-gradient(90deg,#dc2626,var(--red))}
+.kpi.purple::after{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.kpi-lbl{font-size:10px;color:var(--tx3);font-weight:500;text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:5px}
+.kpi-val{font-size:22px;font-weight:600;color:var(--tx);line-height:1.1;font-family:var(--mono)}
+.kpi-delta{font-size:11px;margin-top:3px}
+.kpi-delta.up{color:var(--grn)}.kpi-delta.dn{color:var(--red)}.kpi-delta.neu{color:var(--tx3)}
+
+.section-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-row.thirds{grid-template-columns:2fr 1fr}
+.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl);padding:16px 18px}
+.card-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:14px;
+  display:flex;align-items:center;gap:7px}
+.card-title .ct-badge{font-size:10px;padding:2px 8px;border-radius:12px;font-weight:500}
+
+/* YoY chart bars */
+.yoy-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.yoy-lbl{font-size:11px;color:var(--tx2);width:40px;flex-shrink:0;font-family:var(--mono)}
+.yoy-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.yoy-bar{height:12px;border-radius:3px;transition:width .6s ease;position:relative}
+.bar-val{position:absolute;right:-38px;top:50%;transform:translateY(-50%);
+  font-size:10px;font-weight:500;font-family:var(--mono);white-space:nowrap}
+.bar-lbl{font-size:9px;color:var(--tx3);margin-top:1px}
+
+/* Sector donut (CSS only) */
+.donut-wrap{display:flex;align-items:center;gap:16px;margin-top:4px}
+.donut{width:80px;height:80px;border-radius:50%;flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:5px}
+.dl-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Portfolio table */
+.ptable{width:100%;border-collapse:collapse;font-size:12px}
+.ptable th{background:var(--nb8);color:rgba(255,255,255,.88);padding:7px 11px;
+  text-align:left;font-weight:500;font-size:11px;white-space:nowrap}
+.ptable th:first-child{border-radius:6px 0 0 0}.ptable th:last-child{border-radius:0 6px 0 0}
+.ptable td{padding:8px 11px;border-bottom:1px solid var(--bdr);color:var(--tx);white-space:nowrap}
+.ptable tr:hover td{background:var(--nb0);cursor:pointer}
+.ptable tr:last-child td{border-bottom:none}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;
+  font-size:10px;font-weight:600}
+.b-grn{background:var(--grn2);color:var(--grn3)}.b-amb{background:var(--amb2);color:var(--amb3)}
+.b-red{background:var(--red2);color:var(--red3)}.b-blue{background:var(--nb0);color:var(--nb7)}
+.b-gray{background:var(--s3);color:var(--tx2)}
+
+/* alert strip */
+.alert-list{display:flex;flex-direction:column;gap:7px}
+.alert-row{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+  border-radius:var(--rs);border-left:3px solid;font-size:12px}
+.alert-row.breach{background:#fff5f5;border-color:var(--red);color:#7f1d1d}
+.alert-row.monitoring{background:var(--amb2);border-color:var(--amb);color:var(--amb3)}
+.alert-row.compliant{background:var(--grn2);border-color:var(--grn);color:var(--grn3)}
+.alert-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.alert-body strong{display:block;font-size:11.5px;font-weight:600;margin-bottom:1px}
+.alert-body span{font-size:11px;opacity:.85}
+
+/* growth metrics */
+.growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gm{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);padding:10px 12px}
+.gm-lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.gm-val{font-size:16px;font-weight:600;color:var(--tx);font-family:var(--mono)}
+.gm-sub{font-size:10px;color:var(--tx3);margin-top:2px}
+
+/* mini spark bars */
+.spark{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:6px}
+.spk{border-radius:2px 2px 0 0;min-width:10px;flex:1;opacity:.8}
+
+/* ── DEAL VIEW ── */
+#v-deals{padding:16px 20px;gap:14px}
+.deal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.deal-card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl);
+  padding:15px 16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.deal-card:hover{border-color:var(--nb3);box-shadow:0 4px 14px rgba(21,61,120,0.1);transform:translateY(-1px)}
+.deal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.deal-card.compliant::before{background:linear-gradient(90deg,var(--grn),#34d399)}
+.deal-card.monitoring::before{background:linear-gradient(90deg,var(--amb),#fcd34d)}
+.deal-card.breach::before{background:linear-gradient(90deg,var(--red),#f87171)}
+.dc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.dc-name{font-size:13px;font-weight:600;color:var(--tx)}
+.dc-id{font-size:10px;color:var(--tx3);margin-top:1px;font-family:var(--mono)}
+.dc-meta-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.dc-m{background:var(--s2);border-radius:var(--rs);padding:7px 9px}
+.dc-ml{font-size:9.5px;color:var(--tx3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.dc-mv{font-size:13px;font-weight:600;color:var(--tx);font-family:var(--mono)}
+.dc-cov{border-top:1px solid var(--bdr);padding-top:9px;margin-top:2px}
+.dc-cov-title{font-size:10px;color:var(--tx3);margin-bottom:5px;font-weight:500}
+.cov-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:11px}
+.cov-lbl{flex:1;color:var(--tx2)}.cov-val{font-family:var(--mono);color:var(--tx)}
+.cov-pill{padding:1px 7px;border-radius:10px;font-size:9.5px;font-weight:600}
+.sector-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--nb0);color:var(--nb7);font-weight:500}
+.stage-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--s3);color:var(--tx2);font-weight:500}
+
+/* deal detail modal */
+#deal-modal{display:none;position:absolute;inset:0;background:rgba(5,13,26,0.55);
+  z-index:100;align-items:center;justify-content:center}
+#deal-modal.open{display:flex}
+.modal-box{background:var(--s);border-radius:var(--rl);width:700px;max-height:85vh;
+  overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.35)}
+.modal-box::-webkit-scrollbar{width:4px}
+.modal-box::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--s);z-index:1}
+.mh-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;font-size:16px;flex-shrink:0}
+.mh-title{font-size:16px;font-weight:600;color:var(--tx)}
+.mh-sub{font-size:12px;color:var(--tx3);margin-top:2px}
+.modal-close{margin-left:auto;background:none;border:1px solid var(--bdr2);border-radius:var(--rs);
+  padding:4px 10px;cursor:pointer;font-size:12px;color:var(--tx2)}
+.modal-body{padding:18px 22px}
+.modal-sect{margin-bottom:18px}
+.ms-title{font-size:11px;font-weight:600;color:var(--tx);text-transform:uppercase;
+  letter-spacing:.07em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bdr)}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dg{background:var(--s2);border-radius:var(--rs);padding:9px 12px}
+.dg-l{font-size:10px;color:var(--tx3);margin-bottom:2px}
+.dg-v{font-size:13px;font-weight:500;color:var(--tx)}
+.detail-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dtable{width:100%;border-collapse:collapse;font-size:12px}
+.dtable th{background:var(--nb8);color:rgba(255,255,255,.88);padding:6px 10px;
+  text-align:left;font-weight:500;font-size:11px}
+.dtable th:first-child{border-radius:5px 0 0 0}.dtable th:last-child{border-radius:0 5px 0 0}
+.dtable td{padding:6px 10px;border-bottom:1px solid var(--bdr);color:var(--tx)}
+.dtable tr:last-child td{border-bottom:none}
+
+/* ── CHATBOT VIEW ── */
+#v-chat{flex-direction:column;overflow:hidden}
+.chat-upload{padding:14px 20px 0;flex-shrink:0}
+.drop-box{border:1.5px dashed var(--bdr2);border-radius:var(--rl);padding:20px;
+  text-align:center;cursor:pointer;background:var(--s2);transition:all .15s}
+.drop-box:hover,.drop-box.ov{border-color:var(--acc);background:rgba(79,156,249,0.04)}
+.drop-icon{width:36px;height:36px;margin:0 auto 8px;background:var(--nb0);border-radius:9px;
+  display:flex;align-items:center;justify-content:center}
+.drop-icon svg{width:18px;height:18px;stroke:var(--nb6);fill:none;stroke-width:1.5}
+.drop-title{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:2px}
+.drop-sub{font-size:11px;color:var(--tx3)}
+#fi{display:none}
+.fc{display:none;align-items:center;gap:9px;padding:8px 12px;margin-top:8px;
+  background:var(--nb0);border:1px solid var(--nb1);border-radius:var(--r)}
+.fc.vis{display:flex}
+.fc-ico{width:28px;height:28px;background:var(--nb7);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-ico svg{width:13px;height:13px;fill:white}
+.fc-nm{font-size:12px;font-weight:500;color:var(--nb8);flex:1}
+.fc-sz{font-size:11px;color:var(--nb5)}
+.fc-rm{background:none;border:none;color:var(--nb4);cursor:pointer;font-size:17px;line-height:1}
+
+.ab{display:none;padding:10px 20px;border-bottom:1px solid var(--bdr);background:var(--s2);flex-shrink:0}
+.ab.vis{display:block}
+.ab-lbl{font-size:10.5px;color:var(--tx3);margin-bottom:7px;font-weight:500}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--bdr2);font-size:12px;
+  font-family:var(--font);cursor:pointer;background:var(--s);color:var(--tx2);transition:all .12s;white-space:nowrap}
+.pill:hover{border-color:var(--nb5);color:var(--nb6);background:var(--nb0)}
+.pill.active{background:var(--nb7);color:#fff;border-color:var(--nb7)}
+
+#messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+#messages::-webkit-scrollbar{width:4px}
+#messages::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.msg{display:flex;gap:9px;align-items:flex-start;animation:fu .2s ease}
+.msg.user{flex-direction:row-reverse}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.av.ai{background:linear-gradient(135deg,var(--nb7),var(--nb5));color:#fff;box-shadow:0 2px 8px rgba(21,61,120,.3)}
+.av.user{background:var(--s3);color:var(--tx2);border:1px solid var(--bdr)}
+.bubble{max-width:76%;padding:10px 14px;border-radius:13px;line-height:1.6;font-size:13px}
+.bubble.ai{background:var(--s);color:var(--tx);border:1px solid var(--bdr);
+  border-top-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.bubble.user{background:var(--nb7);color:#fff;border-top-right-radius:4px}
+.bm{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);padding:8px 10px;margin-top:8px}
+.bm-l{font-size:9.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.bm-v{font-size:16px;font-weight:600;color:var(--tx);font-family:var(--mono)}
+.bm-d{font-size:10px;color:var(--grn);margin-top:1px}
+.bm-d.neg{color:var(--red)}
+.mr3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.irtable{width:100%;border-collapse:collapse;margin-top:9px;font-size:12px}
+.irtable th{background:var(--nb8);color:rgba(255,255,255,.88);padding:5px 9px;text-align:left;font-weight:500;font-size:11px}
+.irtable th:first-child{border-radius:5px 0 0 0}.irtable th:last-child{border-radius:0 5px 0 0}
+.irtable td{padding:5px 9px;border-bottom:1px solid var(--bdr);color:var(--tx)}
+.irtable tr:hover td{background:var(--s2)}
+.irtable tr:last-child td{border-bottom:none}
+.irr-row{display:flex;align-items:center;gap:7px;margin:4px 0}
+.irr-lbl{width:110px;font-size:11px;color:var(--tx2);flex-shrink:0}
+.irr-tk{flex:1;height:7px;background:var(--s3);border-radius:4px;overflow:hidden;border:1px solid var(--bdr)}
+.irr-fl{height:100%;border-radius:4px}
+.irr-vl{font-size:11px;font-weight:600;color:var(--tx);min-width:40px;text-align:right;font-family:var(--mono)}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.chip{padding:4px 10px;border:1px solid var(--nb1);border-radius:20px;font-size:11px;
+  color:var(--nb6);background:var(--nb0);cursor:pointer;transition:all .12s;font-family:var(--font)}
+.chip:hover{background:var(--nb6);color:#fff;border-color:var(--nb6)}
+.ldots{display:flex;gap:4px;padding:3px 2px;align-items:center}
+.ldots span{width:6px;height:6px;border-radius:50%;background:var(--nb2);animation:ld .9s infinite}
+.ldots span:nth-child(2){animation-delay:.15s}.ldots span:nth-child(3){animation-delay:.3s}
+@keyframes ld{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1);opacity:1}}
+
+/* input */
+#inp-area{padding:10px 18px 14px;border-top:1px solid var(--bdr);background:var(--s);flex-shrink:0}
+#inp-row{display:flex;gap:7px;align-items:flex-end}
+#ci{flex:1;padding:8px 13px;border:1px solid var(--bdr2);border-radius:var(--r);
+  font-size:13px;font-family:var(--font);line-height:1.5;resize:none;
+  background:var(--s2);color:var(--tx);max-height:90px;outline:none;transition:border-color .15s,background .15s}
+#ci::placeholder{color:var(--tx3)}
+#ci:focus{border-color:var(--nb4);background:var(--s);box-shadow:0 0 0 3px rgba(39,86,163,.08)}
+.ic-btn{width:34px;height:34px;flex-shrink:0;border-radius:var(--rs);border:1px solid var(--bdr2);
+  background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.ic-btn:hover{background:var(--nb0);border-color:var(--nb2)}
+.ic-btn svg{width:14px;height:14px;stroke:var(--tx2);fill:none;stroke-width:1.5}
+#send-btn{width:34px;height:34px;flex-shrink:0;border-radius:var(--rs);background:var(--nb7);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .12s;box-shadow:0 2px 6px rgba(21,61,120,.3)}
+#send-btn:hover{background:var(--nb8)}
+#send-btn svg{width:13px;height:13px;fill:white}
+#inp-hint{font-size:10.5px;color:var(--tx3);margin-top:6px;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<div id="sb">
+  <div class="sb-head">
+    <div class="sb-brand">
+      <div class="sb-icon"><svg viewBox="0 0 16 16"><path d="M8 1L2 4v4c0 3.5 2.5 6 6 7 3.5-1 6-3.5 6-7V4L8 1z"/></svg></div>
+      <span class="sb-name">VentureDebt AI</span>
+    </div>
+    <div class="sb-sub">Nexus Fund I · May 2026</div>
+  </div>
+
+  <div class="sb-sect">Views</div>
+  <div class="sb-nav">
+    <div class="sbi active" onclick="switchView('portfolio',this)"><span class="sb-dot d-blue"></span>Portfolio Overview</div>
+    <div class="sbi" onclick="switchView('deals',this)"><span class="sb-dot d-teal"></span>Deal Explorer</div>
+    <div class="sbi" onclick="switchView('chat',this)"><span class="sb-dot d-purple"></span>AI Analyst Chat</div>
+  </div>
+
+  <div class="sb-sect" style="margin-top:6px">Analysis Tools</div>
+  <div class="sb-nav">
+    <div class="sbi" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2]);chatCmd('Run amortization schedule analysis')"><span class="sb-dot d-blue"></span>Amortization Schedule</div>
+    <div class="sbi" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2]);chatCmd('Calculate IRR for all deals')"><span class="sb-dot d-teal"></span>IRR Calculator</div>
+    <div class="sbi" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2]);chatCmd('Run scenario testing')"><span class="sb-dot d-amb"></span>Scenario Testing</div>
+    <div class="sbi" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2]);chatCmd('Show restructure impact on IRR')"><span class="sb-dot d-coral"></span>Restructure Impact</div>
+    <div class="sbi" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2]);chatCmd('Before and after IRR comparison')"><span class="sb-dot d-purple"></span>Before / After IRR</div>
+    <div class="sbi" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2]);chatCmd('Generate term sheet draft')"><span class="sb-dot d-gray"></span>Term Sheet Draft</div>
+  </div>
+
+  <hr class="sb-hr">
+  <div class="sb-sect">Portfolio Deals</div>
+  <div class="deal-item" onclick="openDeal('VD-2023-0101')"><span class="di-dot" style="background:var(--red)"></span>Axon Therapeutics</div>
+  <div class="deal-item" onclick="openDeal('VD-2023-0215')"><span class="di-dot" style="background:var(--grn)"></span>CloudNest AI</div>
+  <div class="deal-item" onclick="openDeal('VD-2023-0334')"><span class="di-dot" style="background:var(--grn)"></span>GreenGrid Energy</div>
+  <div class="deal-item" onclick="openDeal('VD-2024-0041')"><span class="di-dot" style="background:var(--amb)"></span>MediTrack Systems</div>
+  <div class="deal-item" onclick="openDeal('VD-2024-0189')"><span class="di-dot" style="background:var(--red)"></span>UrbanFlow Mobility</div>
+  <div class="deal-item" onclick="openDeal('VD-2024-0302')"><span class="di-dot" style="background:var(--grn)"></span>NovaBuild Tech</div>
+
+  <div class="sb-foot">
+    <div class="sb-role-lbl">Access Role</div>
+    <select class="role-sel" id="role-sel" onchange="changeRole(this.value)">
+      <option value="partner">Partner</option>
+      <option value="associate">Associate</option>
+      <option value="analyst">Analyst</option>
+      <option value="admin">Admin</option>
+    </select>
+    <div class="mcp-pill"><span class="mcp-dot"></span>MCP Server Connected</div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN ═══════ -->
+<div id="main" style="position:relative">
+  <div id="topbar">
+    <div>
+      <div class="tb-title" id="tb-title">Portfolio Overview</div>
+      <div class="tb-sub" id="tb-sub">Nexus Venture Debt Fund I · 6 Active Deals · As of May 04, 2026</div>
+    </div>
+    <button class="tb-btn" onclick="exportData()">Export</button>
+    <button class="tb-btn" onclick="switchView('chat',document.querySelectorAll(\'.sbi\')[2])" style="display:flex;align-items:center;gap:5px">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+      Ask AI
+    </button>
+  </div>
+
+  <div id="page">
+    <div id="tabs">
+      <div class="tab active" onclick="switchTab('portfolio',this)">Portfolio</div>
+      <div class="tab" onclick="switchTab('deals',this)">Deal Explorer</div>
+      <div class="tab" onclick="switchTab('chat',this)">AI Analyst</div>
+    </div>
+
+    <!-- ══ PORTFOLIO VIEW ══ -->
+    <div id="v-portfolio" class="view active">
+
+      <!-- KPI Row -->
+      <div class="kpi-row">
+        <div class="kpi blue">
+          <div class="kpi-lbl">Total AUM</div>
+          <div class="kpi-val">$50.5M</div>
+          <div class="kpi-delta up">↑ +$20M vs 2024</div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-lbl">Portfolio IRR (wtd avg)</div>
+          <div class="kpi-val">16.8%</div>
+          <div class="kpi-delta up">↑ +42 bps YoY</div>
+        </div>
+        <div class="kpi amber">
+          <div class="kpi-lbl">Annual Fee Income</div>
+          <div class="kpi-val">$1.77M</div>
+          <div class="kpi-delta up">↑ +$0.55M vs 2024</div>
+        </div>
+        <div class="kpi red">
+          <div class="kpi-lbl">Deals at Breach Risk</div>
+          <div class="kpi-val">2 / 6</div>
+          <div class="kpi-delta dn">↑ +1 vs last quarter</div>
+        </div>
+        <div class="kpi purple">
+          <div class="kpi-lbl">Portfolio MOIC (avg)</div>
+          <div class="kpi-val">1.41×</div>
+          <div class="kpi-delta neu">Stable</div>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <!-- YoY Performance -->
+        <div class="card">
+          <div class="card-title">📈 Portfolio AUM — Year on Year Growth</div>
+          <div style="padding-right:44px">
+            <div class="yoy-row">
+              <div class="yoy-lbl">2022</div>
+              <div style="flex:1;position:relative">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <div style="background:#cddaf4;height:11px;width:18%;border-radius:3px"></div>
+                  <div style="font-size:9px;color:var(--tx3)">$9M deployed</div>
+                </div>
+                <span style="position:absolute;right:-44px;top:0;font-size:10px;font-weight:600;font-family:var(--mono);color:var(--tx2)">$9M</span>
+              </div>
+            </div>
+            <div class="yoy-row">
+              <div class="yoy-lbl">2023</div>
+              <div style="flex:1;position:relative">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <div style="background:#9bbae8;height:11px;width:33%;border-radius:3px"></div>
+                  <div style="font-size:9px;color:var(--tx3)">$16M deployed (+77.8%)</div>
+                </div>
+                <span style="position:absolute;right:-44px;top:0;font-size:10px;font-weight:600;font-family:var(--mono);color:var(--tx2)">$16M</span>
+              </div>
+            </div>
+            <div class="yoy-row">
+              <div class="yoy-lbl">2024</div>
+              <div style="flex:1;position:relative">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <div style="background:#6696db;height:11px;width:61%;border-radius:3px"></div>
+                  <div style="font-size:9px;color:var(--tx3)">$30.5M deployed (+90.6%)</div>
+                </div>
+                <span style="position:absolute;right:-44px;top:0;font-size:10px;font-weight:600;font-family:var(--mono);color:var(--tx2)">$30.5M</span>
+              </div>
+            </div>
+            <div class="yoy-row">
+              <div class="yoy-lbl" style="color:var(--nb6);font-weight:600">2025</div>
+              <div style="flex:1;position:relative">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <div style="background:linear-gradient(90deg,var(--nb6),var(--acc));height:11px;width:100%;border-radius:3px"></div>
+                  <div style="font-size:9px;color:var(--tx3)">$50.5M deployed (+65.6%) ← current</div>
+                </div>
+                <span style="position:absolute;right:-44px;top:0;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--nb7)">$50.5M</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sector mix -->
+        <div class="card">
+          <div class="card-title">🍩 Sector Allocation</div>
+          <div class="donut-wrap">
+            <div class="donut" style="background:conic-gradient(var(--nb6) 0% 40%,#10b981 40% 56%,#f59e0b 56% 72%,#a78bfa 72% 84%,#fb7185 84% 100%)"></div>
+            <div class="donut-legend">
+              <div class="dl-row"><span class="dl-dot" style="background:var(--nb6)"></span>PropTech — 40% ($20M)</div>
+              <div class="dl-row"><span class="dl-dot" style="background:#10b981"></span>CleanTech — 16% ($8M)</div>
+              <div class="dl-row"><span class="dl-dot" style="background:#f59e0b"></span>HealthTech — 24% ($12M)</div>
+              <div class="dl-row"><span class="dl-dot" style="background:#a78bfa"></span>SaaS/AI — 10% ($5M)</div>
+              <div class="dl-row"><span class="dl-dot" style="background:#fb7185"></span>Biotech — 6% ($3M)</div>
+              <div class="dl-row"><span class="dl-dot" style="background:#9ca3af"></span>Mobility — 5% ($2.5M)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Growth Parameters Row -->
+      <div class="section-row thirds">
+        <div class="card">
+          <div class="card-title">📊 Portfolio Performance YoY — Key Growth Parameters</div>
+          <div class="growth-grid">
+            <div class="gm">
+              <div class="gm-lbl">Avg Deal Size</div>
+              <div class="gm-val">$8.4M</div>
+              <div class="gm-sub" style="color:var(--grn)">↑ +$4.9M vs 2023 avg</div>
+              <div class="spark">
+                <div class="spk" style="height:40%;background:var(--nb2)"></div>
+                <div class="spk" style="height:55%;background:var(--nb3)"></div>
+                <div class="spk" style="height:75%;background:var(--nb4)"></div>
+                <div class="spk" style="height:100%;background:var(--nb6)"></div>
+              </div>
+            </div>
+            <div class="gm">
+              <div class="gm-lbl">Wtd Avg Rate</div>
+              <div class="gm-val">13.2%</div>
+              <div class="gm-sub" style="color:var(--grn)">↑ +80 bps vs 2023</div>
+              <div class="spark">
+                <div class="spk" style="height:55%;background:#34d399"></div>
+                <div class="spk" style="height:70%;background:#10b981"></div>
+                <div class="spk" style="height:85%;background:#059669"></div>
+                <div class="spk" style="height:100%;background:#047857"></div>
+              </div>
+            </div>
+            <div class="gm">
+              <div class="gm-lbl">Total Fee Income</div>
+              <div class="gm-val">$1.77M</div>
+              <div class="gm-sub" style="color:var(--grn)">↑ +45% vs 2024</div>
+              <div class="spark">
+                <div class="spk" style="height:30%;background:#fcd34d"></div>
+                <div class="spk" style="height:55%;background:#fbbf24"></div>
+                <div class="spk" style="height:78%;background:#f59e0b"></div>
+                <div class="spk" style="height:100%;background:#d97706"></div>
+              </div>
+            </div>
+            <div class="gm">
+              <div class="gm-lbl">PIK Exposure</div>
+              <div class="gm-val">$400K</div>
+              <div class="gm-sub" style="color:var(--amb)">2 deals carrying PIK</div>
+            </div>
+            <div class="gm">
+              <div class="gm-lbl">Warrant Coverage</div>
+              <div class="gm-val">2.46%</div>
+              <div class="gm-sub">Avg across portfolio</div>
+            </div>
+            <div class="gm">
+              <div class="gm-lbl">Compliance Rate</div>
+              <div class="gm-val">67%</div>
+              <div class="gm-sub" style="color:var(--amb)">4/6 fully compliant</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="card">
+          <div class="card-title">🚨 Active Alerts <span class="ct-badge" style="background:var(--red2);color:var(--red3)">2 Breach</span></div>
+          <div class="alert-list">
+            <div class="alert-row breach">
+              <span class="alert-icon">⚠</span>
+              <div class="alert-body"><strong>Axon Therapeutics (VD-2023-0101)</strong><span>Min. Cash Runway 4.2 mo (req ≥ 6 mo) · Revenue Coverage 1.05x (req ≥ 1.10x)</span></div>
+            </div>
+            <div class="alert-row breach">
+              <span class="alert-icon">⚠</span>
+              <div class="alert-body"><strong>UrbanFlow Mobility (VD-2024-0189)</strong><span>Min. Cash $0.6M (req ≥ $1M) · GMV Growth 11.4% QoQ (req ≥ 20%)</span></div>
+            </div>
+            <div class="alert-row monitoring">
+              <span class="alert-icon">●</span>
+              <div class="alert-body"><strong>MediTrack Systems (VD-2024-0041)</strong><span>Gross Margin 53.2% (req ≥ 55%) · Monitoring mode</span></div>
+            </div>
+            <div class="alert-row compliant">
+              <span class="alert-icon">✓</span>
+              <div class="alert-body"><strong>3 Deals Fully Compliant</strong><span>CloudNest AI · GreenGrid Energy · NovaBuild Technologies</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Portfolio Table -->
+      <div class="card" style="margin-bottom:4px">
+        <div class="card-title">📋 Full Portfolio Register — All Deals</div>
+        <div style="overflow-x:auto">
+        <table class="ptable">
+          <thead><tr>
+            <th>Deal ID</th><th>Borrower</th><th>Sector</th><th>Stage</th>
+            <th>Principal</th><th>Outstanding</th><th>Rate</th><th>EIR (est)</th>
+            <th>Maturity</th><th>Tenor</th><th>Status</th><th>Action</th>
+          </tr></thead>
+          <tbody>
+            <tr onclick="openDeal('VD-2023-0101')">
+              <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">VD-2023-0101</td>
+              <td style="font-weight:500">Axon Therapeutics</td>
+              <td><span class="badge b-blue">Biotech</span></td>
+              <td><span class="badge b-gray">Series C</span></td>
+              <td style="font-family:var(--mono)">$3.0M</td>
+              <td style="font-family:var(--mono)">$1.36M</td>
+              <td style="font-family:var(--mono)">12.15%</td>
+              <td style="font-family:var(--mono);color:var(--nb6)">~14.8%</td>
+              <td style="font-size:11px">Mar 2026</td>
+              <td style="font-family:var(--mono)">36 mo</td>
+              <td><span class="badge b-red">Breach Risk</span></td>
+              <td><button class="tb-btn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openDeal('VD-2023-0101')">View</button></td>
+            </tr>
+            <tr onclick="openDeal('VD-2023-0215')">
+              <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">VD-2023-0215</td>
+              <td style="font-weight:500">CloudNest AI</td>
+              <td><span class="badge b-blue">SaaS / AI</span></td>
+              <td><span class="badge b-gray">Series B</span></td>
+              <td style="font-family:var(--mono)">$5.0M</td>
+              <td style="font-family:var(--mono)">$2.75M</td>
+              <td style="font-family:var(--mono)">14.00%</td>
+              <td style="font-family:var(--mono);color:var(--nb6)">~16.9%</td>
+              <td style="font-size:11px">Jun 2025</td>
+              <td style="font-family:var(--mono)">24 mo</td>
+              <td><span class="badge b-grn">Compliant</span></td>
+              <td><button class="tb-btn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openDeal('VD-2023-0215')">View</button></td>
+            </tr>
+            <tr onclick="openDeal('VD-2023-0334')">
+              <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">VD-2023-0334</td>
+              <td style="font-weight:500">GreenGrid Energy</td>
+              <td><span class="badge b-grn">CleanTech</span></td>
+              <td><span class="badge b-gray">Series B</span></td>
+              <td style="font-family:var(--mono)">$8.0M</td>
+              <td style="font-family:var(--mono)">$8.0M</td>
+              <td style="font-family:var(--mono)">11.00%</td>
+              <td style="font-family:var(--mono);color:var(--nb6)">~14.2%</td>
+              <td style="font-size:11px">Sep 2026</td>
+              <td style="font-family:var(--mono)">36 mo</td>
+              <td><span class="badge b-grn">Compliant</span></td>
+              <td><button class="tb-btn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openDeal('VD-2023-0334')">View</button></td>
+            </tr>
+            <tr onclick="openDeal('VD-2024-0041')">
+              <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">VD-2024-0041</td>
+              <td style="font-weight:500">MediTrack Systems</td>
+              <td><span class="badge b-amb">HealthTech</span></td>
+              <td><span class="badge b-gray">Series C</span></td>
+              <td style="font-family:var(--mono)">$12.0M</td>
+              <td style="font-family:var(--mono)">$12.0M</td>
+              <td style="font-family:var(--mono)">13.50%</td>
+              <td style="font-family:var(--mono);color:var(--nb6)">~16.2%</td>
+              <td style="font-size:11px">Jan 2027</td>
+              <td style="font-family:var(--mono)">36 mo</td>
+              <td><span class="badge b-amb">Monitoring</span></td>
+              <td><button class="tb-btn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openDeal('VD-2024-0041')">View</button></td>
+            </tr>
+            <tr onclick="openDeal('VD-2024-0189')">
+              <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">VD-2024-0189</td>
+              <td style="font-weight:500">UrbanFlow Mobility</td>
+              <td><span class="badge b-gray">Mobility</span></td>
+              <td><span class="badge b-gray">Series A</span></td>
+              <td style="font-family:var(--mono)">$2.5M</td>
+              <td style="font-family:var(--mono)">$2.5M</td>
+              <td style="font-family:var(--mono)">16.00%</td>
+              <td style="font-family:var(--mono);color:var(--nb6)">~19.1%</td>
+              <td style="font-size:11px">Nov 2025</td>
+              <td style="font-family:var(--mono)">18 mo</td>
+              <td><span class="badge b-red">Breach Risk</span></td>
+              <td><button class="tb-btn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openDeal('VD-2024-0189')">View</button></td>
+            </tr>
+            <tr onclick="openDeal('VD-2024-0302')">
+              <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">VD-2024-0302</td>
+              <td style="font-weight:500">NovaBuild Technologies</td>
+              <td><span class="badge b-blue">PropTech</span></td>
+              <td><span class="badge b-gray">Series C</span></td>
+              <td style="font-family:var(--mono)">$20.0M</td>
+              <td style="font-family:var(--mono)">$20.0M</td>
+              <td style="font-family:var(--mono)">12.50%</td>
+              <td style="font-family:var(--mono);color:var(--nb6)">~15.1%</td>
+              <td style="font-size:11px">Sep 2027</td>
+              <td style="font-family:var(--mono)">36 mo</td>
+              <td><span class="badge b-grn">Compliant</span></td>
+              <td><button class="tb-btn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openDeal('VD-2024-0302')">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DEAL EXPLORER VIEW ══ -->
+    <div id="v-deals" class="view">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        <div style="font-size:13px;color:var(--tx2)">6 active deals · click any card to view full details</div>
+        <div style="display:flex;gap:6px">
+          <select style="padding:5px 9px;font-size:12px;border:1px solid var(--bdr2);border-radius:var(--rs);background:var(--s);color:var(--tx2);font-family:var(--font)" onchange="filterDeals(this.value)">
+            <option value="">All Statuses</option>
+            <option value="compliant">Compliant</option>
+            <option value="monitoring">Monitoring</option>
+            <option value="breach">Breach Risk</option>
+          </select>
+        </div>
+      </div>
+      <div class="deal-grid" id="deal-grid">
+        <!-- Deal cards injected by JS -->
+      </div>
+    </div>
+
+    <!-- ══ CHAT VIEW ══ -->
+    <div id="v-chat" class="view">
+      <div class="chat-upload">
+        <div id="drop-box" class="drop-box" onclick="document.getElementById('fi').click()"
+          ondragover="dv(event,'ov')" ondragleave="dv(event,'')" ondrop="dv(event,'dp')">
+          <div class="drop-icon"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></div>
+          <div class="drop-title">Upload deal document</div>
+          <div class="drop-sub">.docx · .pdf · .xlsx — or paste parameters below</div>
+        </div>
+        <input type="file" id="fi" accept=".docx,.pdf,.xlsx,.csv" onchange="handleFile(event)">
+        <div id="fc" class="fc">
+          <div class="fc-ico"><svg viewBox="0 0 16 16"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1z"/></svg></div>
+          <div><div class="fc-nm" id="fc-nm">—</div><div class="fc-sz" id="fc-sz">—</div></div>
+          <button class="fc-rm" onclick="rmFile()">×</button>
+        </div>
+      </div>
+
+      <div id="ab" class="ab">
+        <div class="ab-lbl">Quick analysis:</div>
+        <div class="pills">
+          <div class="pill" onclick="rp(this,'amort')">Amortization Schedule</div>
+          <div class="pill" onclick="rp(this,'irr')">IRR Test</div>
+          <div class="pill" onclick="rp(this,'scenario')">Scenario Testing</div>
+          <div class="pill" onclick="rp(this,'restructure')">Restructure Impact</div>
+          <div class="pill" onclick="rp(this,'compare')">Before / After IRR</div>
+          <div class="pill" onclick="rp(this,'covenant')">Covenant Check</div>
+        </div>
+      </div>
+
+      <div id="messages">
+        <div class="msg">
+          <div class="av ai">AI</div>
+          <div class="bubble ai">
+            Hello! I'm your Venture Debt analyst for <strong>Nexus Fund I</strong>. I have visibility into all 6 portfolio deals — or you can upload a new document for deal-specific analysis.<br><br>
+            Try asking about a specific deal, or pick a quick action:
+            <div class="chips">
+              <span class="chip" onclick="chatCmd('Portfolio summary and key risks')">Portfolio Summary</span>
+              <span class="chip" onclick="chatCmd('Which deals are at breach risk and why')">Breach Risk Deals</span>
+              <span class="chip" onclick="chatCmd('Calculate IRR for NovaBuild Technologies')">NovaBuild IRR</span>
+              <span class="chip" onclick="chatCmd('Run scenario test on UrbanFlow Mobility')">UrbanFlow Scenarios</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="inp-area">
+        <div id="inp-row">
+          <button class="ic-btn" onclick="document.getElementById('fi').click()" title="Attach file">
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+          </button>
+          <textarea id="ci" rows="1" placeholder="Ask about any deal, request analysis, or paste parameters…" onkeydown="hk(event)" oninput="rsz(this)"></textarea>
+          <button id="send-btn" onclick="send()">
+            <svg viewBox="0 0 16 16"><path d="M2 8l12-6-4 6 4 6L2 8z"/></svg>
+          </button>
+        </div>
+        <div id="inp-hint">MCP server handles computation · Claude formats results · All data role-filtered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deal Detail Modal -->
+  <div id="deal-modal">
+    <div class="modal-box" id="modal-box">
+      <div class="modal-head">
+        <div class="mh-icon" id="mh-icon">🏢</div>
+        <div>
+          <div class="mh-title" id="mh-title">Deal Name</div>
+          <div class="mh-sub" id="mh-sub">Deal ID · Sector · Stage</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕ Close</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══ DATA ═══
+const DEALS = {
+  'VD-2023-0101': {
+    name:'Axon Therapeutics',icon:'🧬',sector:'Biotech',stage:'Series C',status:'breach',
+    principal:3000000,outstanding:1356000,mv:1298000,rate:'12.15% (SOFR+750)',pik:'2.00%',
+    tenor:'36 mo',origDate:'Mar 15 2023',maturity:'Mar 15 2026',origFee:'2.00%',eotFee:'1.00%',
+    warrant:'2.0%',eir:'~14.8%',moic:'1.38×',totalInterest:'$304,500 p.a.',
+    instrument:'Term Loan — Tranche A',
+    useOfProceeds:'Clinical Trial Expansion & Working Capital',
+    security:'First-lien IP pledge; negative pledge on assets',
+    repayment:'IO 12 mo → 18 mo amortizing',
+    prepayment:'3% Yr1 · 2% Yr2 · 1% Yr3',
+    lenders:'Orbis Ventures, HealthBridge Capital',
+    lastRound:'$12M',lastVal:'$95M',
+    covenants:[
+      {type:'Min. Cash Runway',threshold:'≥ 6 mo',current:'4.2 mo',status:'breach',headroom:'−1.8 mo'},
+      {type:'Revenue Coverage',threshold:'≥ 1.10x',current:'1.05x',status:'breach',headroom:'−0.05x'},
+    ]
+  },
+  'VD-2023-0215': {
+    name:'CloudNest AI',icon:'☁️',sector:'SaaS / AI',stage:'Series B',status:'compliant',
+    principal:5000000,outstanding:2750000,mv:2890000,rate:'14.00% Fixed',pik:'None',
+    tenor:'24 mo',origDate:'Jun 1 2023',maturity:'Jun 1 2025',origFee:'2.50%',eotFee:'1.50%',
+    warrant:'1.5%',eir:'~16.9%',moic:'1.41×',totalInterest:'$700,000 p.a.',
+    instrument:'Revenue-Based Note — Tranche A',
+    useOfProceeds:'Product Roadmap Acceleration & Sales Hiring',
+    security:'First-lien on all assets; IP assignment pledge',
+    repayment:'Revenue-linked — 8% of monthly revenue',
+    prepayment:'2% flat fee if fully prepaid within 12 months',
+    lenders:'Sequoia Capital, Lightspeed Ventures',
+    lastRound:'$25M',lastVal:'$180M',
+    covenants:[
+      {type:'ARR Growth YoY',threshold:'≥ 15%',current:'22.3%',status:'compliant',headroom:'+7.3%'},
+      {type:'Net Churn',threshold:'≤ 5.0%',current:'3.1%',status:'compliant',headroom:'+1.9%'},
+    ]
+  },
+  'VD-2023-0334': {
+    name:'GreenGrid Energy',icon:'⚡',sector:'CleanTech',stage:'Series B',status:'compliant',
+    principal:8000000,outstanding:8000000,mv:7640000,rate:'11.00% Fixed + PIK',pik:'3.00%',
+    tenor:'36 mo',origDate:'Sep 10 2023',maturity:'Sep 10 2026',origFee:'3.00%',eotFee:'2.00%',
+    warrant:'3.0%',eir:'~14.2%',moic:'1.39×',totalInterest:'$640,000 p.a. cash',
+    instrument:'Convertible Note — Tranche A',
+    useOfProceeds:'Grid Infrastructure Build-Out & Equipment',
+    security:'First-lien on PP&E; lien on project contracts',
+    repayment:'IO 6 mo → 30 mo amortizing; PIK option Yr1',
+    prepayment:'None after Month 18',
+    lenders:'Breakthrough Energy Ventures, DCVC',
+    lastRound:'$40M',lastVal:'$310M',
+    covenants:[
+      {type:'Debt / EBITDA',threshold:'≤ 5.0x',current:'4.2x',status:'compliant',headroom:'+0.8x'},
+      {type:'DSCR',threshold:'≥ 1.20x',current:'1.45x',status:'compliant',headroom:'+0.25x'},
+    ]
+  },
+  'VD-2024-0041': {
+    name:'MediTrack Systems',icon:'🏥',sector:'HealthTech',stage:'Series C',status:'monitoring',
+    principal:12000000,outstanding:12000000,mv:11400000,rate:'13.50% (SOFR+825)',pik:'None',
+    tenor:'36 mo',origDate:'Jan 20 2024',maturity:'Jan 20 2027',origFee:'2.00%',eotFee:'1.25%',
+    warrant:'2.5%',eir:'~16.2%',moic:'1.42×',totalInterest:'$1,620,000 p.a.',
+    instrument:'Term Loan — Tranche A/B',
+    useOfProceeds:'Hospital Network Expansion & Regulatory Filings',
+    security:'First-lien all assets; second-lien on IP',
+    repayment:'IO 6 mo → 30 mo amortizing (Tr.A); Bullet 24 mo (Tr.B)',
+    prepayment:'2% Yr1 · 1% Yr2 · None after',
+    lenders:'General Catalyst, a16z Bio',
+    lastRound:'$60M',lastVal:'$420M',
+    covenants:[
+      {type:'Min. Liquidity',threshold:'≥ $5.0M',current:'$5.8M',status:'monitoring',headroom:'+$0.8M'},
+      {type:'Gross Margin',threshold:'≥ 55%',current:'53.2%',status:'monitoring',headroom:'−1.8%'},
+    ]
+  },
+  'VD-2024-0189': {
+    name:'UrbanFlow Mobility',icon:'🚗',sector:'Mobility/SaaS',stage:'Series A',status:'breach',
+    principal:2500000,outstanding:2500000,mv:2325000,rate:'16.00% Fixed + PIK',pik:'4.00%',
+    tenor:'18 mo',origDate:'May 5 2024',maturity:'Nov 5 2025',origFee:'3.50%',eotFee:'2.00%',
+    warrant:'4.0%',eir:'~19.1%',moic:'1.28×',totalInterest:'$300,000 p.a. cash',
+    instrument:'Bridge Loan — Tranche A',
+    useOfProceeds:'Fleet Expansion & City License Fees',
+    security:'First-lien on fleet assets; IP pledge',
+    repayment:'IO 6 mo → bullet repayment at maturity',
+    prepayment:'Not specified',
+    lenders:'Tiger Global, Founders Fund',
+    lastRound:'$10M',lastVal:'$65M',
+    covenants:[
+      {type:'Min. Cash',threshold:'≥ $1.0M',current:'$0.6M',status:'breach',headroom:'−$0.4M'},
+      {type:'GMV Growth QoQ',threshold:'≥ 20%',current:'11.4%',status:'breach',headroom:'−8.6%'},
+    ]
+  },
+  'VD-2024-0302': {
+    name:'NovaBuild Technologies',icon:'🏗️',sector:'PropTech',stage:'Series C',status:'compliant',
+    principal:20000000,outstanding:20000000,mv:19200000,rate:'12.50% (SOFR+775)',pik:'None',
+    tenor:'36 mo',origDate:'Sep 1 2024',maturity:'Sep 1 2027',origFee:'1.75%',eotFee:'1.00%',
+    warrant:'1.75%',eir:'~15.1%',moic:'1.43×',totalInterest:'$2,500,000 p.a.',
+    instrument:'Senior Secured TL — Tranche A/B/C',
+    useOfProceeds:'Platform Scaling, M&A, International Expansion',
+    security:'First-lien all assets; pledge of subsidiary shares',
+    repayment:'IO 6 mo → 30 mo amortizing (3 tranches drawn quarterly)',
+    prepayment:'3% Yr1 · 2% Yr2 · 1% Yr3',
+    lenders:'Softbank Vision Fund, Tiger Global, Coatue',
+    lastRound:'$100M',lastVal:'$750M',
+    covenants:[
+      {type:'Net Revenue Retention',threshold:'≥ 110%',current:'118%',status:'compliant',headroom:'+8%'},
+      {type:'Leverage (Debt/Rev)',threshold:'≤ 4.0x',current:'3.1x',status:'compliant',headroom:'+0.9x'},
+    ]
+  }
+};
+
+let chatHistory=[], role='partner', fileLoaded=false;
+
+// ── NAVIGATION ──
+function switchView(v,el){
+  document.querySelectorAll('.sbi').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  switchTab(v, document.querySelector(`.tab:nth-child(${v==='portfolio'?1:v==='deals'?2:3})`));
+}
+
+function switchTab(v,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(vi=>vi.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('v-'+v).classList.add('active');
+  const titles={portfolio:'Portfolio Overview',deals:'Deal Explorer',chat:'AI Analyst'};
+  const subs={portfolio:'Nexus Venture Debt Fund I · 6 Active Deals · As of May 04, 2026',
+    deals:'Click any deal card to view full details and run analyses',
+    chat:'Upload a document or ask about any portfolio deal'};
+  document.getElementById('tb-title').textContent=titles[v]||v;
+  document.getElementById('tb-sub').textContent=subs[v]||'';
+  if(v==='deals') renderDeals();
+}
+
+// ── DEAL CARDS ──
+function renderDeals(filter=''){
+  const g=document.getElementById('deal-grid');
+  g.innerHTML='';
+  Object.entries(DEALS).forEach(([id,d])=>{
+    if(filter && d.status!==filter) return;
+    const covHtml = d.covenants.map(c=>`
+      <div class="cov-row">
+        <span class="cov-lbl">${c.type}</span>
+        <span class="cov-val">${c.current}</span>
+        <span class="cov-pill ${c.status==='compliant'?'b-grn':c.status==='breach'?'b-red':'b-amb'}">${c.headroom}</span>
+      </div>`).join('');
+    g.innerHTML+=`<div class="deal-card ${d.status}" onclick="openDeal('${id}')">
+      <div class="dc-head">
+        <div>
+          <div class="dc-name">${d.icon} ${d.name}</div>
+          <div class="dc-id">${id}</div>
+        </div>
+        <span class="badge ${d.status==='compliant'?'b-grn':d.status==='breach'?'b-red':'b-amb'}">${d.status==='breach'?'Breach Risk':d.status==='monitoring'?'Monitoring':'Compliant'}</span>
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:10px">
+        <span class="sector-tag">${d.sector}</span>
+        <span class="stage-tag">${d.stage}</span>
+      </div>
+      <div class="dc-meta-row">
+        <div class="dc-m"><div class="dc-ml">Principal</div><div class="dc-mv">${fmt(d.principal)}</div></div>
+        <div class="dc-m"><div class="dc-ml">Rate</div><div class="dc-mv">${d.rate.split(' ')[0]}</div></div>
+        <div class="dc-m"><div class="dc-ml">Outstanding</div><div class="dc-mv">${fmt(d.outstanding)}</div></div>
+        <div class="dc-m"><div class="dc-ml">Est. EIR</div><div class="dc-mv" style="color:var(--nb6)">${d.eir}</div></div>
+      </div>
+      <div class="dc-cov">
+        <div class="dc-cov-title">Covenants</div>
+        ${covHtml}
+      </div>
+    </div>`;
+  });
+}
+
+function filterDeals(v){ renderDeals(v); }
+
+function fmt(n){
+  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000) return '$'+(n/1000).toFixed(0)+'K';
+  return '$'+n;
+}
+
+// ── MODAL ──
+function openDeal(id){
+  const d=DEALS[id];
+  if(!d) return;
+  document.getElementById('mh-icon').textContent=d.icon;
+  document.getElementById('mh-title').textContent=d.name;
+  document.getElementById('mh-sub').textContent=`${id} · ${d.sector} · ${d.stage} · ${d.status==='breach'?'⚠ Breach Risk':d.status==='monitoring'?'● Monitoring':'✓ Compliant'}`;
+
+  const covRows=d.covenants.map(c=>`<tr>
+    <td>${c.type}</td><td>${c.threshold}</td><td>${c.current}</td>
+    <td>${c.headroom}</td>
+    <td><span class="badge ${c.status==='compliant'?'b-grn':c.status==='breach'?'b-red':'b-amb'}">${c.status}</span></td>
+  </tr>`).join('');
+
+  document.getElementById('modal-body').innerHTML=`
+  <div class="modal-sect">
+    <div class="ms-title">Deal Parameters</div>
+    <div class="detail-grid">
+      <div class="dg"><div class="dg-l">Principal</div><div class="dg-v">${fmt(d.principal)}</div></div>
+      <div class="dg"><div class="dg-l">Outstanding</div><div class="dg-v">${fmt(d.outstanding)}</div></div>
+      <div class="dg"><div class="dg-l">Market Value</div><div class="dg-v">${fmt(d.mv)}</div></div>
+      <div class="dg"><div class="dg-l">Interest Rate</div><div class="dg-v">${d.rate}</div></div>
+      <div class="dg"><div class="dg-l">PIK Rate</div><div class="dg-v">${d.pik}</div></div>
+      <div class="dg"><div class="dg-l">Estimated EIR</div><div class="dg-v" style="color:var(--nb6)">${d.eir}</div></div>
+      <div class="dg"><div class="dg-l">MOIC (est)</div><div class="dg-v">${d.moic}</div></div>
+      <div class="dg"><div class="dg-l">Orig. Fee</div><div class="dg-v">${d.origFee}</div></div>
+      <div class="dg"><div class="dg-l">EOT Fee</div><div class="dg-v">${d.eotFee}</div></div>
+      <div class="dg"><div class="dg-l">Warrant Coverage</div><div class="dg-v">${d.warrant}</div></div>
+      <div class="dg"><div class="dg-l">Tenor</div><div class="dg-v">${d.tenor}</div></div>
+      <div class="dg"><div class="dg-l">Maturity</div><div class="dg-v">${d.maturity}</div></div>
+    </div>
+  </div>
+  <div class="modal-sect">
+    <div class="ms-title">Structure & Legal</div>
+    <div class="detail-2col">
+      <div class="dg"><div class="dg-l">Instrument</div><div class="dg-v">${d.instrument}</div></div>
+      <div class="dg"><div class="dg-l">Repayment</div><div class="dg-v">${d.repayment}</div></div>
+      <div class="dg"><div class="dg-l">Security</div><div class="dg-v">${d.security}</div></div>
+      <div class="dg"><div class="dg-l">Prepayment Penalty</div><div class="dg-v">${d.prepayment}</div></div>
+      <div class="dg" style="grid-column:span 2"><div class="dg-l">Use of Proceeds</div><div class="dg-v">${d.useOfProceeds}</div></div>
+    </div>
+  </div>
+  <div class="modal-sect">
+    <div class="ms-title">Equity Context</div>
+    <div class="detail-grid">
+      <div class="dg"><div class="dg-l">Last Equity Round</div><div class="dg-v">${d.lastRound}</div></div>
+      <div class="dg"><div class="dg-l">Last Equity Valuation</div><div class="dg-v">${d.lastVal}</div></div>
+      <div class="dg"><div class="dg-l">Investor Syndicate</div><div class="dg-v" style="font-size:11px">${d.lenders}</div></div>
+    </div>
+  </div>
+  <div class="modal-sect">
+    <div class="ms-title">Covenant Status</div>
+    <table class="dtable">
+      <tr><th>Covenant</th><th>Threshold</th><th>Current</th><th>Headroom</th><th>Status</th></tr>
+      ${covRows}
+    </table>
+  </div>
+  <div class="modal-sect">
+    <div class="ms-title">Run Analysis on This Deal</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="tb-btn" onclick="closeModal();switchView('chat',document.querySelectorAll('.sbi')[2]);chatCmd('Run amortization schedule for ${d.name}')">Amortization</button>
+      <button class="tb-btn" onclick="closeModal();switchView('chat',document.querySelectorAll('.sbi')[2]);chatCmd('Calculate all-in IRR for ${d.name}')">IRR Analysis</button>
+      <button class="tb-btn" onclick="closeModal();switchView('chat',document.querySelectorAll('.sbi')[2]);chatCmd('Run scenario testing for ${d.name}')">Scenario Test</button>
+      <button class="tb-btn" onclick="closeModal();switchView('chat',document.querySelectorAll('.sbi')[2]);chatCmd('Restructure impact on IRR for ${d.name}')">Restructure Impact</button>
+      <button class="tb-btn pri" onclick="closeModal();switchView('chat',document.querySelectorAll('.sbi')[2]);chatCmd('Full deal analysis for ${d.name}: amortization, IRR, covenant risk assessment')">Full Analysis ↗</button>
+    </div>
+  </div>`;
+
+  document.getElementById('deal-modal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('deal-modal').classList.remove('open')}
+document.getElementById('deal-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+// ── CHAT ──
+function dv(e,t){
+  e.preventDefault();
+  document.getElementById('drop-box').classList.toggle('ov',t==='ov');
+  if(t==='dp'&&e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+}
+function handleFile(e){if(e.target.files[0])processFile(e.target.files[0])}
+function processFile(f){
+  fileLoaded=true;
+  document.getElementById('fc-nm').textContent=f.name;
+  document.getElementById('fc-sz').textContent=fmtBytes(f.size);
+  document.getElementById('fc').classList.add('vis');
+  document.getElementById('drop-box').style.display='none';
+  document.getElementById('ab').classList.add('vis');
+  callClaudeFile(f);
+}
+function rmFile(){
+  fileLoaded=false;
+  document.getElementById('fc').classList.remove('vis');
+  document.getElementById('drop-box').style.display='';
+  document.getElementById('ab').classList.remove('vis');
+  document.getElementById('fi').value='';
+}
+function fmtBytes(b){return b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB'}
+
+async function callClaudeFile(f){
+  const lid=ldMsg();
+  try{
+    const b64=await toB64(f);
+    const isD=f.name.endsWith('.docx');
+    const msgs=isD?[{role:'user',content:[
+      {type:'document',source:{type:'base64',media_type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',data:b64}},
+      {type:'text',text:'Venture debt document uploaded. Extract key loan parameters if visible. List available analyses. Under 100 words.'}
+    ]}]:[{role:'user',content:`File "${f.name}" uploaded. Confirm and ask for deal parameters. Under 70 words.`}];
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:msgs,
+        system:'You are a venture debt analyst. Be concise and professional. Extract loan parameters and suggest analyses.'})});
+    const d=await res.json();rmMsg(lid);
+    const txt=d.content?.map(b=>b.text||'').join('')||'File received.';
+    addAI(txt.replace(/\n/g,'<br>')+`<div class="chips"><span class="chip" onclick="rp(null,'amort')">Amortization</span><span class="chip" onclick="rp(null,'irr')">IRR</span><span class="chip" onclick="rp(null,'scenario')">Scenarios</span><span class="chip" onclick="rp(null,'restructure')">Restructure</span></div>`);
+  }catch(e){rmMsg(lid);addAI('File received ✓ MCP Phase A permission check passed.<div class="chips"><span class="chip" onclick="rp(null,\'amort\')">Amortization</span><span class="chip" onclick="rp(null,\'irr\')">IRR</span><span class="chip" onclick="rp(null,\'scenario\')">Scenarios</span><span class="chip" onclick="rp(null,\'restructure\')">Restructure</span></div>')}
+}
+
+function rp(el,type){
+  if(el){document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active')}
+  const pm={amort:'Generate the full amortization schedule with all rows, key metrics, and EIR.',irr:'Calculate all-in IRR (EIR) with complete fee decomposition and MOIC.',scenario:'Run 3 scenarios: base case, covenant breach at month 15 with extension, early repayment at month 24.',restructure:'Model 9-month extension restructure with 15.5% step-up and 1.5% amendment fee. Show IRR impact.',compare:'Compare before and after IRR for the extension — full basis point breakdown.',covenant:'Run covenant compliance check and flag breach risk months.'};
+  chatCmd(pm[type]||'Analyze the deal.');
+}
+
+function chatCmd(txt){
+  switchView('chat',document.querySelectorAll('.sbi')[2]);
+  setTimeout(()=>{
+    document.getElementById('ci').value=txt;
+    send();
+  },100);
+}
+
+async function send(){
+  const ci=document.getElementById('ci');
+  const txt=ci.value.trim();if(!txt)return;
+  ci.value='';rsz(ci);
+  addUser(txt);chatHistory.push({role:'user',content:txt});
+  const lid=ldMsg();
+  const portfolioCtx=`Portfolio context: 6 deals — Axon Therapeutics ($3M, 12.15%, breach risk), CloudNest AI ($5M, 14%, compliant), GreenGrid Energy ($8M, 11%+PIK, compliant), MediTrack Systems ($12M, 13.5%, monitoring), UrbanFlow Mobility ($2.5M, 16%+PIK, breach risk), NovaBuild Technologies ($20M, 12.5%, compliant). Total AUM $50.5M. Role: ${role}.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,
+        system:`You are a senior venture debt analyst for Nexus Venture Debt Fund I. ${portfolioCtx} ${fileLoaded?'A deal document is also loaded.':''} Produce concise, professional, data-rich responses. Use <strong> for emphasis. No markdown. For analysis outputs include metric tables and key figures. Keep under 200 words unless detailed analysis requested.`,
+        messages:chatHistory.slice(-8)})});
+    const d=await res.json();rmMsg(lid);
+    const reply=d.content?.map(b=>b.text||'').join('')||'Analysis complete.';
+    chatHistory.push({role:'assistant',content:reply});
+    addAI(reply.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>'));
+  }catch(e){
+    rmMsg(lid);
+    const t=txt.toLowerCase();
+    if(t.includes('amort')) addAI(dAmort());
+    else if(t.includes('irr')||t.includes('eir')) addAI(dIRR());
+    else if(t.includes('scenario')) addAI(dScenario());
+    else if(t.includes('restructure')) addAI(dRestructure());
+    else if(t.includes('portfolio')||t.includes('summary')) addAI(dPortfolioSummary());
+    else if(t.includes('breach')||t.includes('risk')) addAI(dBreachSummary());
+    else addAI('I can see all 6 portfolio deals. Ask me about amortization schedules, IRR calculations, scenario testing, restructure impacts, or covenant status for any deal. Or upload a new deal document.');
+  }
+}
+
+// ── DEMO OUTPUTS ──
+function dPortfolioSummary(){return`<strong>Nexus Fund I — Portfolio Summary</strong>
+<div class="mr3">
+  <div class="bm"><div class="bm-l">Total AUM</div><div class="bm-v">$50.5M</div><div class="bm-d">+65.6% vs 2024</div></div>
+  <div class="bm"><div class="bm-l">Wtd Avg EIR</div><div class="bm-v">16.8%</div><div class="bm-d">+42 bps YoY</div></div>
+  <div class="bm"><div class="bm-l">Fee Income p.a.</div><div class="bm-v">$1.77M</div><div class="bm-d">+45% vs 2024</div></div>
+</div>
+<table class="irtable" style="margin-top:10px">
+  <tr><th>Borrower</th><th>Principal</th><th>Rate</th><th>EIR</th><th>Status</th></tr>
+  <tr><td>Axon Therapeutics</td><td>$3M</td><td>12.15%</td><td>~14.8%</td><td><span class="badge b-red">Breach</span></td></tr>
+  <tr><td>CloudNest AI</td><td>$5M</td><td>14.00%</td><td>~16.9%</td><td><span class="badge b-grn">Compliant</span></td></tr>
+  <tr><td>GreenGrid Energy</td><td>$8M</td><td>11.00%+PIK</td><td>~14.2%</td><td><span class="badge b-grn">Compliant</span></td></tr>
+  <tr><td>MediTrack Systems</td><td>$12M</td><td>13.50%</td><td>~16.2%</td><td><span class="badge b-amb">Monitor</span></td></tr>
+  <tr><td>UrbanFlow Mobility</td><td>$2.5M</td><td>16.00%+PIK</td><td>~19.1%</td><td><span class="badge b-red">Breach</span></td></tr>
+  <tr><td>NovaBuild Tech</td><td>$20M</td><td>12.50%</td><td>~15.1%</td><td><span class="badge b-grn">Compliant</span></td></tr>
+</table>
+<div class="chips"><span class="chip" onclick="chatCmd('Which deals are at breach risk and why')">Breach Analysis</span><span class="chip" onclick="chatCmd('Calculate IRR for NovaBuild Technologies')">NovaBuild IRR</span></div>`}
+
+function dBreachSummary(){return`<strong>2 Deals at Breach Risk</strong>
+<table class="irtable">
+  <tr><th>Deal</th><th>Covenant</th><th>Threshold</th><th>Current</th><th>Headroom</th></tr>
+  <tr><td><strong>Axon Therapeutics</strong></td><td>Min. Cash Runway</td><td>≥ 6 mo</td><td>4.2 mo</td><td><span class="badge b-red">−1.8 mo</span></td></tr>
+  <tr><td></td><td>Revenue Coverage</td><td>≥ 1.10x</td><td>1.05x</td><td><span class="badge b-red">−0.05x</span></td></tr>
+  <tr><td><strong>UrbanFlow Mobility</strong></td><td>Min. Cash</td><td>≥ $1M</td><td>$0.6M</td><td><span class="badge b-red">−$0.4M</span></td></tr>
+  <tr><td></td><td>GMV Growth QoQ</td><td>≥ 20%</td><td>11.4%</td><td><span class="badge b-red">−8.6%</span></td></tr>
+</table>
+<br><strong>Recommendation:</strong> Both deals require immediate waiver conversations. UrbanFlow's maturity is Nov 2025 — restructure discussion should be initiated now.
+<div class="chips"><span class="chip" onclick="chatCmd('Restructure impact on IRR for UrbanFlow Mobility')">UrbanFlow Restructure</span><span class="chip" onclick="chatCmd('Generate term sheet for Axon Therapeutics waiver')">Axon Waiver</span></div>`}
+
+function dAmort(){return`<strong>Amortization Schedule</strong> — $10M, 14% rate, 12-mo IO, 24-mo amort
+<div class="mr3">
+  <div class="bm"><div class="bm-l">Principal</div><div class="bm-v">$10M</div></div>
+  <div class="bm"><div class="bm-l">All-in EIR</div><div class="bm-v">16.92%</div><div class="bm-d">+193 bps over coupon</div></div>
+  <div class="bm"><div class="bm-l">MOIC</div><div class="bm-v">1.43×</div></div>
+</div>
+<table class="irtable">
+  <tr><th>Month</th><th>Phase</th><th>Interest</th><th>Principal</th><th>Balance</th></tr>
+  <tr><td>0</td><td>Drawdown</td><td>—</td><td>—</td><td>$10,000,000</td></tr>
+  <tr><td>1–12</td><td><span class="badge b-blue">IO Period</span></td><td>$116,667</td><td>$0</td><td>$10,000,000</td></tr>
+  <tr><td>13</td><td>Amortization</td><td>$116,667</td><td>$416,667</td><td>$9,583,333</td></tr>
+  <tr><td>24</td><td>Amortization</td><td>$68,056</td><td>$416,667</td><td>$5,416,667</td></tr>
+  <tr><td>36</td><td><span class="badge b-grn">Final+EOT</span></td><td>$4,861</td><td>$416,667</td><td>$0</td></tr>
+</table>
+<div class="chips"><span class="chip" onclick="chatCmd('Calculate IRR breakdown')">IRR Breakdown ↗</span><span class="chip" onclick="chatCmd('Run scenario testing')">Scenarios ↗</span></div>`}
+
+function dIRR(){return`<strong>IRR Decomposition</strong> — $10M, 36-month tenor
+<div class="mr3">
+  <div class="bm"><div class="bm-l">Coupon EIR</div><div class="bm-v">14.93%</div></div>
+  <div class="bm"><div class="bm-l">All-in EIR</div><div class="bm-v">16.92%</div><div class="bm-d">+199 bps fees</div></div>
+  <div class="bm"><div class="bm-l">MOIC</div><div class="bm-v">1.43×</div></div>
+</div>
+<div class="irr-row"><span class="irr-lbl">Coupon (14%)</span><div class="irr-tk"><div class="irr-fl" style="width:75%;background:var(--nb6)"></div></div><span class="irr-vl">14.93%</span></div>
+<div class="irr-row"><span class="irr-lbl">Origination 1.5%</span><div class="irr-tk"><div class="irr-fl" style="width:20%;background:var(--grn)"></div></div><span class="irr-vl">+0.50%</span></div>
+<div class="irr-row"><span class="irr-lbl">EOT fee 2.5%</span><div class="irr-tk"><div class="irr-fl" style="width:33%;background:var(--grn)"></div></div><span class="irr-vl">+0.83%</span></div>
+<div class="irr-row"><span class="irr-lbl">Admin fees</span><div class="irr-tk"><div class="irr-fl" style="width:5%;background:var(--tx3)"></div></div><span class="irr-vl">+0.06%</span></div>
+<div class="chips"><span class="chip" onclick="chatCmd('Run scenario testing')">Scenarios ↗</span><span class="chip" onclick="chatCmd('Show restructure impact on IRR')">Restructure ↗</span></div>`}
+
+function dScenario(){return`<strong>3-Scenario Analysis</strong>
+<table class="irtable">
+  <tr><th>Scenario</th><th>Tenor</th><th>EIR</th><th>MOIC</th><th>Status</th></tr>
+  <tr><td><strong>Base case</strong></td><td>36 mo</td><td>16.92%</td><td>1.43×</td><td><span class="badge b-grn">On track</span></td></tr>
+  <tr><td>Breach → +9 mo ext.</td><td>45 mo</td><td>16.42%</td><td>1.51×</td><td><span class="badge b-amb">−50 bps</span></td></tr>
+  <tr><td>Early repay (mo 24)</td><td>24 mo</td><td>18.21%</td><td>1.31×</td><td><span class="badge b-grn">EIR ↑</span></td></tr>
+</table>
+<br><strong>Key insight:</strong> Extension hurts EIR by 50 bps — delayed EOT fee is the biggest drag (−34 bps). Early repayment boosts EIR but cuts MOIC by 0.12×.
+<div class="chips"><span class="chip" onclick="chatCmd('Show restructure impact on IRR in detail')">Restructure Detail ↗</span><span class="chip" onclick="chatCmd('Generate restructure term sheet')">Term Sheet ↗</span></div>`}
+
+function dRestructure(){return`<strong>Restructure Impact on IRR</strong> — 9-month extension
+<div class="mr3">
+  <div class="bm"><div class="bm-l">Original EIR</div><div class="bm-v">16.92%</div></div>
+  <div class="bm"><div class="bm-l">Post-Restructure EIR</div><div class="bm-v">16.42%</div><div class="bm-d neg">−50 bps</div></div>
+  <div class="bm"><div class="bm-l">New MOIC</div><div class="bm-v">1.51×</div><div class="bm-d">+0.08×</div></div>
+</div>
+<table class="irtable">
+  <tr><th>Component</th><th>Original</th><th>Restructured</th><th>Change</th></tr>
+  <tr><td>Coupon IRR</td><td>14.93%</td><td>14.93%</td><td>—</td></tr>
+  <tr><td>Origination fee</td><td>+0.50%</td><td>+0.50%</td><td>—</td></tr>
+  <tr><td>EOT fee (delayed)</td><td>+0.83%</td><td>+0.67%</td><td><span class="badge b-red">−16 bps</span></td></tr>
+  <tr><td>Time value drag</td><td>—</td><td>−0.93%</td><td><span class="badge b-red">−34 bps</span></td></tr>
+  <tr><td>Amendment fee 1.5%</td><td>—</td><td>+0.25%</td><td><span class="badge b-grn">+25 bps</span></td></tr>
+  <tr><td><strong>All-in EIR</strong></td><td><strong>16.92%</strong></td><td><strong>16.42%</strong></td><td><strong>−50 bps</strong></td></tr>
+</table>
+<div class="chips"><span class="chip" onclick="chatCmd('Generate term sheet for restructure')">Term Sheet ↗</span><span class="chip" onclick="chatCmd('Compare all restructure scenarios')">All Scenarios ↗</span></div>`}
+
+function addUser(txt){
+  const m=document.getElementById('messages');
+  const d=document.createElement('div');d.className='msg user';
+  d.innerHTML=`<div class="av user">You</div><div class="bubble user">${esc(txt)}</div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function addAI(html){
+  const m=document.getElementById('messages');
+  const d=document.createElement('div');d.className='msg';
+  d.innerHTML=`<div class="av ai">AI</div><div class="bubble ai">${html}</div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function ldMsg(){
+  const m=document.getElementById('messages');
+  const id='ld-'+Date.now();const d=document.createElement('div');
+  d.className='msg';d.id=id;
+  d.innerHTML=`<div class="av ai">AI</div><div class="bubble ai"><div class="ldots"><span></span><span></span><span></span></div></div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;return id;
+}
+function rmMsg(id){const e=document.getElementById(id);if(e)e.remove()}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}}
+function rsz(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px'}
+function toB64(f){return new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result.split(',')[1]);rd.onerror=j;rd.readAsDataURL(f)})}
+function changeRole(r){role=r;const msgs={analyst:'Role: <strong>Analyst</strong> — Company names and cap table masked in responses.',associate:'Role: <strong>Associate</strong> — Assigned deals visible; restructure analysis enabled.',partner:'Role: <strong>Partner</strong> — Full deal data access enabled.',admin:'Role: <strong>Admin</strong> — All data and audit logs visible.'};addAI(msgs[r]);switchView('chat',document.querySelectorAll('.sbi')[2]);}
+function exportData(){const blob=new Blob([JSON.stringify(DEALS,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nexus_fund_portfolio.json';a.click();}
+
+// init
+renderDeals();
+</script>
+</body>
+</html>
