@@ -108,7 +108,7 @@ export function DealView({ deal: d, backendSummary, onIrrClick, onTool }: Props)
     const base = `${d.name} (${d.instrument_type}), ${fD(d.principal)} at ${fP(d.rate)}, IO ${d.io}mo, amort ${d.amort}mo, orig ${fP(d.orig_fee)}, EOT ${fP(d.eot_fee)}${d.pik_rate ? `, PIK ${fP(d.pik_rate)}` : ''}`
     switch (tool) {
       case 'irr':    return `Calculate the all-in IRR for: ${base}. Pre-computed EIR: ${irrStr}${moicVal ? `, MOIC: ${moicVal.toFixed(2)}x` : ''}. Confirm EIR and provide: all-in EIR, MOIC, total income, fee decomp in bps (HTML table).`
-      case 'amort':  return `Month-by-month amortization schedule for: ${base}. HTML table: Month | Phase | Opening Bal | Interest | Principal | Closing Bal. Show every month up to 36, else every 3rd + final.`
+      case 'amort':  return `Month-by-month amortization schedule for: ${base}. Markdown table: Month | Phase | Opening Bal | Interest | Principal | EOT Fee | Total Payment | Closing Bal. Show every month up to 36, else every 3rd + final.`
       case 'restr':  return `Restructure options for ${d.name}: ${base}. Compare: (1) base case, (2) maturity +6mo, (3) rate +150bps, (4) covenant waiver +2%, (5) distressed. For each: EIR change in bps, MOIC impact, recommendation.`
       case 'impact': return `IRR impact analysis for ${d.name}: ${base}. Show impact of: maturity +9mo, rate +200bps, covenant waiver. HTML table with EIR before/after/delta for each scenario.`
       case 'cov':    return `Covenant analysis for ${d.name} (${d.instrument_type}, ${fD(d.principal)} at ${fP(d.rate)}, sector: ${d.sector || 'N/A'}, status: ${d.status}). Provide: typical covenants, status assessment, recommended actions. HTML table for covenant list.`
@@ -202,7 +202,7 @@ export function DealView({ deal: d, backendSummary, onIrrClick, onTool }: Props)
           <table className="w-full border-collapse font-mono text-[11px]">
             <thead>
               <tr style={{ background: '#0f2044', color: 'rgba(255,255,255,0.85)' }}>
-                {['Mo.','Date','Phase','Opening bal.','Interest','Principal','Total payment','Closing bal.'].map((h) => (
+                {['Mo.','Date','Phase','Opening bal.','Interest','Principal','EOT fee','Total payment','Closing bal.'].map((h) => (
                   <th key={h} className="sticky top-0 z-10 px-2 py-1.5 text-left text-[9.5px] font-medium tracking-[0.05em]"
                       style={{ background: '#0f2044' }}>{h}</th>
                 ))}
@@ -221,6 +221,7 @@ export function DealView({ deal: d, backendSummary, onIrrClick, onTool }: Props)
                     <td className="px-2 py-1.5">{fD(r.open_bal)}</td>
                     <td className="px-2 py-1.5">{fD(r.interest)}</td>
                     <td className="px-2 py-1.5">{r.prin > 0 ? fD(r.prin) : '—'}</td>
+                    <td className="px-2 py-1.5">{r.eot > 0 ? fD(r.eot) : '—'}</td>
                     <td className="px-2 py-1.5 font-semibold">{fD(r.total)}</td>
                     <td className="px-2 py-1.5">{fD(r.close_bal)}</td>
                   </tr>
