@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+    background: #f7f8fa;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+    color: #0d1117;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d0d5df; border-radius: 2px; }
+
+  body {
+    @apply antialiased;
+  }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes ld {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
+  40%            { transform: scale(1);   opacity: 1;   }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes irr-seg-in {
+  from { width: 0; }
+}
+
+.msg-anim { animation: msg-in 0.18s ease; }
+
+.ldot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9bbae8;
+  animation: ld 0.9s infinite;
+}
+.ldot:nth-child(2) { animation-delay: 0.15s; }
+.ldot:nth-child(3) { animation-delay: 0.3s; }
+
+.ai-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4f9cf9;
+  animation: pulse-dot 2s infinite;
+}
+
+/* ── AMORTIZATION TABLE ROW CLASSES ── */
+.row-paid td   { background: #f0fdf4; color: #166534; opacity: 0.85; }
+.row-paid td:first-child { border-left: 3px solid #10b981; }
+
+.row-today td  { background: #eff6ff; color: #1e3f7a; font-weight: 600; }
+.row-today td:first-child { border-left: 3px solid #4f9cf9; }
+
+.row-pending td:first-child { border-left: 3px solid #e2e6ed; }
+
+.row-overdue td  { background: #fff1f2; color: #991b1b; }
+.row-overdue td:first-child { border-left: 3px solid #ef4444; }
+
+/* ── CHAT PANEL SLIDE ── */
+.chat-panel {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.22s ease;
+  flex-shrink: 0;
+}
+/* When open, width is controlled by React state (panelWidth).
+   The transition is suppressed while dragging via inline style. */
+.chat-panel.open { overflow: visible; }
+
+/* ── IRR SEGMENT BAR ── */
+.irr-seg {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width 0.5s ease;
+}
+
+/* ── CHIP HOVER ── */
+.chip {
+  padding: 2px 8px;
+  border: 1px solid #cddaf4;
+  border-radius: 5px;
+  font-size: 10.5px;
+  color: #2756a3;
+  background: #eaf0fb;
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  transition: all 0.12s;
+  display: inline-block;
+}
+.chip:hover { background: #cddaf4; color: #162d5e; }
+
+/* ── SIDEBAR ACTIVE INDICATOR ── */
+.si-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 55%;
+  background: #4f9cf9;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── MARKDOWN CONTENT ── */
+.md-answer table { width: 100%; border-collapse: collapse; margin-top: 7px; font-size: 10.5px; }
+.md-answer table th { background: #eaf0fb; color: #1e3f7a; padding: 4px 6px; text-align: left; font-size: 9.5px; font-weight: 500; }
+.md-answer table td { padding: 3px 6px; border-bottom: 1px solid #e2e6ed; }
+.md-answer table tr:last-child td { border-bottom: none; }
