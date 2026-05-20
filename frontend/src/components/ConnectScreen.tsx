@@ -1,8 +1,24 @@
 import { useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { toast } from 'sonner'
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 import type { Deal } from '../dealTypes'
 import { uploadPortfolio } from '../api'
+import { SAMPLE_PORTFOLIOS } from '../config/samplePortfolios'
 import { ValidationErrorModal } from './ValidationErrorModal'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 
 interface Props {
   onDealsLoaded: (deals: Deal[], sourceName: string) => void
@@ -10,6 +26,23 @@ interface Props {
 }
 
 type Source = 'file' | 'path' | 'server' | null
+
+const pathFormSchema = z.object({
+  url: z
+    .string()
+    .min(1, 'Enter a URL')
+    .refine(
+      (s) => {
+        try {
+          const u = new URL(s.trim())
+          return u.protocol === 'http:' || u.protocol === 'https:'
+        } catch {
+          return false
+        }
+      },
+      { message: 'Enter a valid http(s) URL' },
+    ),
+})
 
 const STATS = [
   { value: '21+',    label: 'AI analysis tools' },
@@ -28,16 +61,50 @@ const CAPABILITIES = [
 ]
 
 export function ConnectScreen({ onDealsLoaded }: Props) {
-  const [source, setSource] = useState<Source>(null)
+  const [source, setSource] = useState<Source>('file')
   const [dragging, setDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [pathVal, setPathVal] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const pathForm = useForm<z.infer<typeof pathFormSchema>>({
+    resolver: zodResolver(pathFormSchema),
+    defaultValues: { url: '' },
+  })
 
   // Validation state
   const [validationErrors, setValidationErrors] = useState<{ missing: string[]; foundColumns: string[]; fileName: string } | null>(null)
   const [uploadSuccess, setUploadSuccess] = useState<{ dealCount: number; fileName: string } | null>(null)
+
+  async function loadSamplePortfolio(sample: (typeof SAMPLE_PORTFOLIOS)[number]) {
+    setSource('file')
+    setValidationErrors(null)
+    setUploadSuccess(null)
+    setError(null)
+    setLoading(true)
+    try {
+      const resp = await fetch(sample.file)
+      if (!resp.ok) throw new Error(`Could not load sample (${resp.status})`)
+      const blob = await resp.blob()
+      const file = new File([blob], sample.filename, {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
+      const { deals, filename } = await uploadPortfolio(file)
+      setUploadSuccess({ dealCount: deals.length, fileName: filename })
+      setTimeout(() => onDealsLoaded(deals, filename), 900)
+    } catch (e) {
+      const err = e as Error & { missingColumns?: string[] }
+      if (err.missingColumns && err.missingColumns.length > 0) {
+        setValidationErrors({ missing: err.missingColumns, foundColumns: [], fileName: sample.filename })
+      } else {
+        const msg = err.message || 'Could not load sample portfolio'
+        setError(msg)
+        toast.error('Sample load failed', { description: msg })
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   async function handleFile(file: File) {
     setValidationErrors(null)
@@ -53,7 +120,9 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
       if (err.missingColumns && err.missingColumns.length > 0) {
         setValidationErrors({ missing: err.missingColumns, foundColumns: [], fileName: file.name })
       } else {
-        setError(err.message || 'Upload error')
+        const msg = err.message || 'Upload error'
+        setError(msg)
+        toast.error('Upload failed', { description: msg })
       }
     } finally {
       setLoading(false)
@@ -68,8 +137,8 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
     setTimeout(() => fileInputRef.current?.click(), 100)
   }
 
-  async function handlePath() {
-    const url = pathVal.trim()
+  async function handlePathSubmit(values: z.infer<typeof pathFormSchema>) {
+    const url = values.url.trim()
     if (!url) return
     setValidationErrors(null)
     setUploadSuccess(null)
@@ -89,7 +158,9 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
       if (err.missingColumns && err.missingColumns.length > 0) {
         setValidationErrors({ missing: err.missingColumns, foundColumns: [], fileName: url })
       } else {
-        setError(err.message || 'Connection error')
+        const msg = err.message || 'Connection error'
+        setError(msg)
+        toast.error('Could not load portfolio', { description: msg })
       }
     } finally {
       setLoading(false)
@@ -210,19 +281,17 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
 
         {/* ── RIGHT PANEL: connect form ──────────────────────────────── */}
         <div className="flex flex-col items-center justify-center overflow-y-auto bg-white px-12 py-10">
-          <div className="w-full max-w-[440px]">
-
-            {/* Section title */}
-            <div className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9ca3af]">
-              Get started
-            </div>
-            <div className="mb-1.5 text-[22px] font-semibold leading-tight text-[#0d1117]">
-              Connect your portfolio
-            </div>
-            <p className="mb-7 text-[13px] leading-relaxed text-[#4b5563]">
-              Load your deal data to unlock IRR analysis, covenant monitoring, restructure scenarios and AI-powered insights.
-            </p>
-
+          <Card className="w-full max-w-[440px] border-border shadow-md">
+            <CardHeader className="space-y-1 pb-2">
+              <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Get started
+              </div>
+              <CardTitle className="text-[22px] font-semibold leading-tight">Connect your portfolio</CardTitle>
+              <CardDescription className="text-[13px] leading-relaxed">
+                Load your deal data to unlock IRR analysis, covenant monitoring, restructure scenarios and AI-powered insights.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0">
             {/* Source cards */}
             <div className="mb-5 grid grid-cols-3 gap-2.5">
               {([
@@ -264,14 +333,15 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
                   ),
                 },
               ] as const).map((card) => (
-                <button
+                <Button
                   key={card.id}
                   type="button"
+                  variant="outline"
                   onClick={() => setSource(card.id as Source)}
-                  className={`group flex flex-col items-center gap-2.5 rounded-[10px] border p-4 text-center transition-all duration-200 ${
+                  className={`group flex h-auto flex-col items-center gap-2.5 rounded-[10px] border p-4 text-center font-normal transition-all duration-200 ${
                     source === card.id
-                      ? 'border-[#2756a3] bg-[#eaf0fb] shadow-sm'
-                      : 'border-[#e2e6ed] bg-[#f7f8fa] hover:border-[#3d72c8] hover:bg-[#eaf0fb] hover:shadow-sm'
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm'
                   }`}
                 >
                   <div className={`flex h-9 w-9 items-center justify-center rounded-[8px] border transition-colors ${
@@ -283,7 +353,7 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
                     <div className="text-[12px] font-semibold text-[#0d1117]">{card.label}</div>
                     <div className="mt-0.5 text-[10.5px] leading-relaxed text-[#9ca3af]">{card.sub}</div>
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -367,7 +437,7 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(f); e.target.value = '' }}
                 />
 
-                {/* Auto-detect note + sample download */}
+                {/* Required columns note */}
                 <div className="mt-2.5 flex items-start gap-1.5 rounded-[7px] border border-[#cddaf4] bg-[#eaf0fb] px-3 py-2">
                   <svg viewBox="0 0 16 16" className="mt-0.5 h-3 w-3 shrink-0 fill-[#2756a3]">
                     <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 12H7V7h2v5zm0-6H7V4h2v2z"/>
@@ -375,14 +445,42 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
                   <p className="flex-1 text-[10.5px] leading-relaxed text-[#2756a3]">
                     <strong>Required columns:</strong> Borrower · Instrument Type · Principal · Interest Rate · Tenure · Orig. Fee · EOT Fee · Covenant Status
                   </p>
-                  <a
-                    href="/sample-portfolio.xlsx"
-                    download="sample-portfolio.xlsx"
-                    onClick={(e) => e.stopPropagation()}
-                    className="ml-1 shrink-0 rounded-[4px] border border-[#9bbae8] bg-white px-2 py-0.5 font-mono text-[9.5px] text-[#2756a3] transition-colors hover:bg-[#cddaf4]"
-                  >
-                    ↓ sample
-                  </a>
+                </div>
+
+                {/* One-click sample portfolios */}
+                <div className="mt-3">
+                  <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af]">
+                    Try a sample portfolio
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {SAMPLE_PORTFOLIOS.map((sample) => (
+                      <div key={sample.id} className="flex items-stretch overflow-hidden rounded-[7px] border border-[#cddaf4] bg-white">
+                        <button
+                          type="button"
+                          disabled={loading}
+                          onClick={() => void loadSamplePortfolio(sample)}
+                          className="px-2.5 py-1.5 text-left transition-colors hover:bg-[#eaf0fb] disabled:opacity-50"
+                          title={`Load ${sample.label}`}
+                        >
+                          <span className="block text-[11px] font-semibold text-[#2756a3]">{sample.shortLabel}</span>
+                          <span className="block text-[9.5px] text-[#9ca3af]">Load</span>
+                        </button>
+                        <a
+                          href={sample.file}
+                          download={sample.filename}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center border-l border-[#cddaf4] px-2 text-[#2756a3] transition-colors hover:bg-[#eaf0fb]"
+                          title={`Download ${sample.filename}`}
+                          aria-label={`Download ${sample.label}`}
+                        >
+                          <svg viewBox="0 0 14 14" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                            <path d="M7 1v8m0 0L4.5 6.5M7 9l2.5-2.5"/><path d="M1.5 11.5h11"/>
+                          </svg>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-[10px] text-[#9ca3af]">Click a sample to load it instantly · ↓ to download only</p>
                 </div>
 
                 {/* Show "view errors" link when validation failed */}
@@ -400,32 +498,38 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
 
             {/* URL / API form */}
             {(source === 'path' || source === 'server') && (
-              <div className="mb-4">
-                <label className="mb-1.5 block font-mono text-[10.5px] uppercase tracking-[0.05em] text-[#9ca3af]">
-                  {source === 'path' ? 'File URL or shared path' : 'API endpoint URL'}
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    className="flex-1 rounded-[7px] border bg-[#f7f8fa] px-3 py-2.5 font-mono text-[12.5px] text-[#0d1117] outline-none transition-colors focus:border-[#3d72c8] focus:bg-white"
-                    style={{ borderColor: '#d0d5df' }}
-                    placeholder={source === 'path' ? 'https://…/portfolio.xlsx' : 'https://api.firm.com/portfolio'}
-                    value={pathVal}
-                    onChange={(e) => setPathVal(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') void handlePath() }}
+              <Form {...pathForm}>
+                <form
+                  className="mb-4 space-y-2"
+                  onSubmit={pathForm.handleSubmit((v) => void handlePathSubmit(v))}
+                >
+                  <FormField
+                    control={pathForm.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-mono text-[10.5px] uppercase tracking-[0.05em] text-muted-foreground">
+                          {source === 'path' ? 'File URL or shared path' : 'API endpoint URL'}
+                        </FormLabel>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input
+                              className="flex-1 rounded-md font-mono text-[12.5px]"
+                              placeholder={source === 'path' ? 'https://…/portfolio.xlsx' : 'https://api.firm.com/portfolio'}
+                              autoComplete="off"
+                              {...field}
+                            />
+                          </FormControl>
+                          <Button type="submit" disabled={loading} className="shrink-0 rounded-md px-4">
+                            Connect
+                          </Button>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <button
-                    type="button"
-                    disabled={loading}
-                    onClick={handlePath}
-                    className="rounded-[7px] px-4 py-2.5 text-[12.5px] font-medium text-white transition-colors disabled:opacity-60"
-                    style={{ background: '#162d5e' }}
-                    onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = '#0f2044' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = '#162d5e' }}
-                  >
-                    Connect
-                  </button>
-                </div>
-              </div>
+                </form>
+              </Form>
             )}
 
             {/* No source selected placeholder */}
@@ -450,19 +554,17 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
 
             {/* CTA button */}
             {source === 'file' && !loading && (
-              <button
+              <Button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="mb-4 flex w-full items-center justify-center gap-2 rounded-[9px] py-3 text-[13.5px] font-semibold text-white transition-all"
+                className="mb-4 flex w-full items-center justify-center gap-2 rounded-[9px] py-3 text-[13.5px] font-semibold text-primary-foreground shadow-md"
                 style={{ background: 'linear-gradient(135deg, #162d5e, #2756a3)', boxShadow: '0 4px 20px rgba(39,86,163,0.3)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(39,86,163,0.45)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(39,86,163,0.3)' }}
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                 </svg>
                 Choose portfolio file
-              </button>
+              </Button>
             )}
 
             {/* Divider */}
@@ -492,14 +594,14 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
               ))}
               <div className="flex-1" />
               <a
-                href="/sample-portfolio.xlsx"
+                href="/samples/sample-portfolio.xlsx"
                 download="sample-portfolio.xlsx"
                 className="flex items-center gap-1.5 rounded-[5px] border border-[#cddaf4] bg-[#eaf0fb] px-2.5 py-1 text-[10.5px] font-medium text-[#2756a3] transition-colors hover:bg-[#cddaf4]"
               >
                 <svg viewBox="0 0 14 14" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
                   <path d="M7 1v8m0 0L4.5 6.5M7 9l2.5-2.5"/><path d="M1.5 11.5h11"/>
                 </svg>
-                Download sample file
+                Download demo sample
               </a>
             </div>
 
@@ -518,7 +620,8 @@ export function ConnectScreen({ onDealsLoaded }: Props) {
                 <div className="text-[10.5px] text-[#9ca3af]">Parsed on your private backend · never shared with third parties</div>
               </div>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

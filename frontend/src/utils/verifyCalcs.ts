@@ -9,7 +9,7 @@ export function buildVerifyPrompt(
   browserIRRs: Record<string, IRRResult | null>,
 ): string {
   // Compact CSV format — drastically shorter prompt for faster LLM response
-  const header = 'deal_id,rate,io,amort,tenure,orig_fee,eot_fee,pik_rate,browser_eir,browser_moic'
+  const header = 'deal_id,rate,io,amort,tenure,orig_fee,eot_fee,pik_rate,browser_irr,browser_moic'
   const rows = deals.map((d) => {
     const b = browserIRRs[d.id]
     return [
@@ -26,7 +26,7 @@ export function buildVerifyPrompt(
     ].join(',')
   })
 
-  return `Verify private-credit IRR calcs. For each deal: EIR via Newton-Raphson (CF₀=−P×(1−orig_fee), monthly coupon+amort, CFₙ+=P×eot_fee), MOIC=(total_in/P), totalIncome=total interest+fees. Set corrected=true if your EIR differs >5bps. Reply ONLY with JSON array, zero prose.
+  return `Verify private-credit IRR calcs. For each deal: annual IRR via Newton-Raphson (CF₀=−P×(1−orig_fee), monthly coupon+amort, CFₙ+=P×eot_fee), MOIC=(total_in/P), totalIncome=total interest+fees. Set corrected=true if your IRR differs >5bps. Reply ONLY with JSON array, zero prose.
 
 Format: [{"deal_id":"X","annIRR":0.1234,"moic":1.23,"totalIncome":100000,"corrected":false}]
 

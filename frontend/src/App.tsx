@@ -1,51 +1,68 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { fetchHealth, getPortfolioAISummary, getPortfolioSummary } from './api'
 import type { AppView, Deal } from './dealTypes'
 import type { PortfolioSummaryResponse, ToolCall } from './types'
+
+import { AppShell, type AppShellCrumb } from '@/components/layouts/app-shell'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { ConnectScreen } from './components/ConnectScreen'
 import { Sidebar } from './components/Sidebar'
 import { ChatPanel } from './components/ChatPanel'
 import { IrrModal } from './components/IrrModal'
-import { PortfolioView } from './components/views/PortfolioView'
-import { ChartsView } from './components/views/ChartsView'
-import { ScenarioView } from './components/views/ScenarioView'
-import { CovenantView } from './components/views/CovenantView'
-import { DealView } from './components/views/DealView'
+
+const PortfolioView = lazy(() => import('./components/views/PortfolioView').then((m) => ({ default: m.PortfolioView })))
+const ChartsView = lazy(() => import('./components/views/ChartsView').then((m) => ({ default: m.ChartsView })))
+const ScenarioView = lazy(() => import('./components/views/ScenarioView').then((m) => ({ default: m.ScenarioView })))
+const CovenantView = lazy(() => import('./components/views/CovenantView').then((m) => ({ default: m.CovenantView })))
+const DealView = lazy(() => import('./components/views/DealView').then((m) => ({ default: m.DealView })))
+
+function ViewFallback() {
+  return (
+    <div className="flex h-full flex-col gap-3 p-6">
+      <Skeleton className="h-8 w-48" />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Skeleton className="h-24 rounded-lg" />
+        <Skeleton className="h-24 rounded-lg" />
+        <Skeleton className="h-24 rounded-lg" />
+        <Skeleton className="h-24 rounded-lg" />
+      </div>
+      <Skeleton className="min-h-[200px] flex-1 rounded-lg" />
+    </div>
+  )
+}
 
 export default function App() {
-  // ── DATA ──────────────────────────────────────────────────────────
   const [deals, setDeals] = useState<Deal[]>([])
   const [sourceName, setSourceName] = useState<string | null>(null)
 
-  // ── BACKEND SUMMARY ───────────────────────────────────────────────
   const [backendSummary, setBackendSummary] = useState<PortfolioSummaryResponse | null>(null)
   const [summaryLoading, setSummaryLoading] = useState(false)
 
-  // ── NAVIGATION ────────────────────────────────────────────────────
   const [view, setView] = useState<AppView>('portfolio')
   const [currentDealId, setCurrentDealId] = useState<string | null>(null)
   const currentDeal = deals.find((d) => d.id === currentDealId) ?? null
 
-  // ── CONNECT SCREEN ────────────────────────────────────────────────
   const [showConnect, setShowConnect] = useState(true)
 
-  // ── CHAT ──────────────────────────────────────────────────────────
   const [chatOpen, setChatOpen] = useState(false)
   const [chatTitle, setChatTitle] = useState('Analysis')
   const [chatPrompt, setChatPrompt] = useState<string | undefined>(undefined)
   const [chatAnswer, setChatAnswer] = useState<string | undefined>(undefined)
   const [chatToolCalls, setChatToolCalls] = useState<ToolCall[] | undefined>(undefined)
 
-  // ── IRR MODAL ─────────────────────────────────────────────────────
   const [irrTarget, setIrrTarget] = useState<Deal | null | 'portfolio'>('portfolio')
   const [irrOpen, setIrrOpen] = useState(false)
 
-  // ── HEALTH ────────────────────────────────────────────────────────
   const [health, setHealth] = useState<Record<string, string> | null>(null)
 
   const refreshHealth = useCallback(async () => {
-    try { setHealth(await fetchHealth()) } catch { /* ignore */ }
+    try {
+      setHealth(await fetchHealth())
+    } catch {
+      /* ignore */
+    }
   }, [])
 
   useEffect(() => {
@@ -54,7 +71,6 @@ export default function App() {
     return () => window.clearInterval(t)
   }, [refreshHealth])
 
-  // ── BACKEND SUMMARY ───────────────────────────────────────────────
   async function loadBackendSummary(newDeals: Deal[]) {
     if (!newDeals.length) return
     setSummaryLoading(true)
@@ -63,13 +79,14 @@ export default function App() {
       const summary = await getPortfolioSummary(newDeals)
       setBackendSummary(summary)
     } catch {
-      // silently fall back to browser calculations
+      toast.message('Portfolio summary unavailable', {
+        description: 'Using browser-side calculations until the API responds.',
+      })
     } finally {
       setSummaryLoading(false)
     }
   }
 
-  // ── HANDLERS ──────────────────────────────────────────────────────
   function handleDealsLoaded(newDeals: Deal[], name: string) {
     setDeals(newDeals)
     setSourceName(name)
@@ -111,6 +128,7 @@ export default function App() {
       setBackendSummary(result.metrics)
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to generate portfolio AI summary.'
+      toast.error('Portfolio AI summary failed', { description: msg })
       openChat('Portfolio AI summary', undefined, `Error: ${msg}`)
     }
   }
@@ -119,8 +137,7 @@ export default function App() {
     openChat(toolLabel, prompt)
   }
 
-  // ── BREADCRUMB ────────────────────────────────────────────────────
-  function breadcrumb(): { label: string; onClick?: () => void }[] {
+  function breadcrumb(): AppShellCrumb[] {
     if (view === 'deal' && currentDeal) {
       return [
         { label: 'Portfolio overview', onClick: () => handleViewChange('portfolio') },
@@ -129,19 +146,23 @@ export default function App() {
     }
     const labels: Record<AppView, string> = {
       portfolio: 'Portfolio overview',
-      charts:    'Charts',
-      scenario:  'Scenario comparison',
-      covenant:  'Covenant tracker',
-      deal:      'Deal',
+      charts: 'Charts',
+      scenario: 'Scenario comparison',
+      covenant: 'Covenant tracker',
+      deal: 'Deal',
     }
     return [{ label: labels[view] }]
   }
   const crumbs = breadcrumb()
 
   return (
-    <div id="app" className="flex h-screen overflow-hidden" style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, color: '#0d1117' }}>
-
-      {/* Connect screen (fullscreen onboarding) */}
+    <>
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:text-primary-foreground focus:shadow-md"
+      >
+        Skip to main content
+      </a>
       {showConnect && (
         <ConnectScreen
           onDealsLoaded={handleDealsLoaded}
@@ -149,108 +170,74 @@ export default function App() {
         />
       )}
 
-      {/* Sidebar */}
-      <Sidebar
-        deals={deals}
-        view={view}
-        currentDealId={currentDealId}
-        sourceName={sourceName}
-        health={health}
-        onViewChange={handleViewChange}
-        onDealSelect={handleDealSelect}
-        onChangeSource={() => setShowConnect(true)}
-      />
-
-      {/* Main area */}
-      <div id="main" className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Top bar */}
-        <div
-          className="flex h-12 shrink-0 items-center gap-2.5 border-b bg-white px-5"
-          style={{ borderColor: '#e2e6ed' }}
-        >
-          <div className="flex flex-1 items-center gap-1.5 text-[13px] text-[#4b5563]">
-            {crumbs.map((c, i) => (
-              <span key={i} className="flex items-center gap-1.5">
-                {i > 0 && <span style={{ color: '#d0d5df' }}>/</span>}
-                {c.onClick ? (
-                  <button type="button" onClick={c.onClick}
-                    className="font-medium text-[#2756a3] hover:text-[#162d5e]">
-                    {c.label}
-                  </button>
-                ) : (
-                  <span className="font-medium text-[#0d1117]">{c.label}</span>
-                )}
-              </span>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Content + chat row */}
-        <div className="flex min-w-0 flex-1 overflow-hidden">
-          {/* Content */}
-          <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden" style={{ background: '#f7f8fa' }}>
-            {/* Subtle loading indicator while backend computes portfolio summary */}
-            {summaryLoading && (
-              <div className="absolute inset-x-0 top-0 z-20 h-0.5 overflow-hidden" style={{ background: '#e2e6ed' }}>
-                <div className="h-full animate-pulse" style={{ background: 'linear-gradient(90deg, transparent, #4f9cf9, transparent)', width: '60%', animation: 'slide 1.5s ease-in-out infinite' }} />
-              </div>
-            )}
-            <div id="content" className="flex-1 overflow-hidden">
-              {view === 'portfolio' && (
-                <PortfolioView
-                  deals={deals}
-                  backendSummary={backendSummary}
-                  summaryLoading={summaryLoading}
-                  onDealSelect={handleDealSelect}
-                  onIrrClick={openIrr}
-                  onAIAnalysis={() => void handlePortfolioAISummary()}
-                />
-              )}
-              {view === 'charts' && (
-                <ChartsView
-                  deals={deals}
-                  backendSummary={backendSummary}
-                />
-              )}
-              {view === 'scenario' && (
-                <ScenarioView
-                  deals={deals}
-                  onAIAnalysis={(p) => openChat('Scenario analysis', p)}
-                />
-              )}
-              {view === 'covenant' && (
-                <CovenantView deals={deals} onAIAnalysis={(p) => openChat('Covenant review', p)} />
-              )}
-              {view === 'deal' && currentDeal && (
-                <DealView
-                  deal={currentDeal}
-                  backendSummary={backendSummary}
-                  onIrrClick={openIrr}
-                  onTool={(label, prompt) => handleToolChat(label, prompt)}
-                />
-              )}
-              {view === 'deal' && !currentDeal && deals.length === 0 && (
-                <div className="flex h-full items-center justify-center text-[13px] text-[#9ca3af]">
-                  Select a deal from the sidebar.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Chat panel */}
+      <AppShell
+        sidebar={({ closeMobileNav }) => (
+          <Sidebar
+            deals={deals}
+            view={view}
+            currentDealId={currentDealId}
+            sourceName={sourceName}
+            health={health}
+            onViewChange={handleViewChange}
+            onDealSelect={handleDealSelect}
+            onChangeSource={() => setShowConnect(true)}
+            onMobileNavClose={closeMobileNav}
+          />
+        )}
+        crumbs={crumbs}
+        summaryLoading={summaryLoading}
+        chatAside={
           <ChatPanel
             open={chatOpen}
             title={chatTitle}
-            onClose={() => { setChatOpen(false); setChatPrompt(undefined); setChatAnswer(undefined); setChatToolCalls(undefined) }}
+            onClose={() => {
+              setChatOpen(false)
+              setChatPrompt(undefined)
+              setChatAnswer(undefined)
+              setChatToolCalls(undefined)
+            }}
             initialPrompt={chatPrompt}
             initialAssistantMessage={chatAnswer}
             initialToolCalls={chatToolCalls}
           />
-        </div>
-      </div>
+        }
+      >
+        <Suspense fallback={<ViewFallback />}>
+          {view === 'portfolio' && (
+            <PortfolioView
+              deals={deals}
+              backendSummary={backendSummary}
+              summaryLoading={summaryLoading}
+              onDealSelect={handleDealSelect}
+              onIrrClick={openIrr}
+              onAIAnalysis={() => void handlePortfolioAISummary()}
+            />
+          )}
+          {view === 'charts' && (
+            <ChartsView deals={deals} backendSummary={backendSummary} />
+          )}
+          {view === 'scenario' && (
+            <ScenarioView deals={deals} onAIAnalysis={(p) => openChat('Scenario analysis', p)} />
+          )}
+          {view === 'covenant' && (
+            <CovenantView deals={deals} onAIAnalysis={(p) => openChat('Covenant review', p)} />
+          )}
+          {view === 'deal' && currentDeal && (
+            <DealView
+              deal={currentDeal}
+              backendSummary={backendSummary}
+              onIrrClick={openIrr}
+              onTool={(label, prompt) => handleToolChat(label, prompt)}
+            />
+          )}
+          {view === 'deal' && !currentDeal && deals.length === 0 && (
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              Select a deal from the sidebar.
+            </div>
+          )}
+        </Suspense>
+      </AppShell>
 
-      {/* IRR modal */}
       {irrOpen && (
         <IrrModal
           deal={irrTarget === 'portfolio' ? null : (irrTarget as Deal | null)}
@@ -259,6 +246,6 @@ export default function App() {
           onClose={() => setIrrOpen(false)}
         />
       )}
-    </div>
+    </>
   )
 }

@@ -3,6 +3,18 @@ import type { Deal, DealStatus } from '../../dealTypes'
 import { getInstrumentConfig, STATUS_BADGE, STATUS_LABEL } from '../../dealTypes'
 import { getCovenants as fetchCovenants } from '../../api'
 import type { CovenantResult } from '../../types'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 interface Props {
   deals: Deal[]
@@ -32,15 +44,23 @@ function nextQuarter(): string {
 }
 
 function StatusKpi({ label, value, tone, sub }: { label: string; value: number; tone: 're' | 'am' | 'gr'; sub: string }) {
-  const TONE = { re: 'linear-gradient(90deg,#b91c1c,#ef4444)', am: 'linear-gradient(90deg,#d97706,#f59e0b)', gr: 'linear-gradient(90deg,#059669,#10b981)' }
+  const TONE = {
+    re: 'linear-gradient(90deg,#b91c1c,#ef4444)',
+    am: 'linear-gradient(90deg,#d97706,#f59e0b)',
+    gr: 'linear-gradient(90deg,#059669,#10b981)',
+  }
   const VAL_COLOR = { re: '#ef4444', am: '#f59e0b', gr: '#10b981' }
   return (
-    <div className="relative overflow-hidden rounded-[9px] border bg-white p-3.5" style={{ borderColor: '#e2e6ed' }}>
-      <div className="mb-1.5 font-mono text-[9.5px] uppercase tracking-[0.06em] text-[#9ca3af]">{label}</div>
-      <div className="mb-0.5 text-[20px] font-semibold" style={{ color: VAL_COLOR[tone] }}>{value}</div>
-      <div className="font-mono text-[10.5px] text-[#9ca3af]">{sub}</div>
-      <div className="absolute inset-x-0 bottom-0 h-[3px] rounded-b-[9px]" style={{ background: TONE[tone] }} />
-    </div>
+    <Card className="relative overflow-hidden border-border shadow-sm">
+      <CardContent className="p-3.5 pt-4">
+        <div className="mb-1.5 font-mono text-[9.5px] uppercase tracking-wide text-muted-foreground">{label}</div>
+        <div className="mb-0.5 text-xl font-semibold" style={{ color: VAL_COLOR[tone] }}>
+          {value}
+        </div>
+        <div className="font-mono text-[10.5px] text-muted-foreground">{sub}</div>
+      </CardContent>
+      <div className="absolute inset-x-0 bottom-0 h-[3px] rounded-b-lg" style={{ background: TONE[tone] }} />
+    </Card>
   )
 }
 
@@ -66,7 +86,11 @@ export function CovenantView({ deals, onAIAnalysis }: Props) {
   }
 
   if (!deals.length) {
-    return <div className="flex h-full items-center justify-center text-[13px] text-[#9ca3af]">Load portfolio data first.</div>
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+        Load portfolio data first.
+      </div>
+    )
   }
 
   const breach  = deals.filter((d) => d.status === 'breach risk')
@@ -105,11 +129,20 @@ export function CovenantView({ deals, onAIAnalysis }: Props) {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="px-6 py-5">
-        <div className="mb-0.5 text-[18px] font-semibold tracking-tight text-[#0d1117]">Covenant tracker</div>
-        <div className="mb-4 font-mono text-[11.5px] text-[#9ca3af]">
-          Threshold monitoring &amp; breach alerts across {deals.length} deals
-        </div>
+      <div className="px-4 py-5 sm:px-6">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">Covenant tracker</h1>
+        <p className="mb-4 font-mono text-[11.5px] text-muted-foreground">
+          Threshold monitoring and breach alerts across {deals.length} deals
+        </p>
+
+        {breach.length > 0 && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>Breach attention required</AlertTitle>
+            <AlertDescription>
+              {breach.length} deal{breach.length === 1 ? '' : 's'} flagged as breach risk. Prioritize waivers and committee review.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* KPIs */}
         <div className="mb-4 grid grid-cols-3 gap-2">
@@ -134,7 +167,7 @@ export function CovenantView({ deals, onAIAnalysis }: Props) {
               : `✓ Standard quarterly monitoring. Next covenant test: ${nextQuarter()}.`
 
             return (
-              <div key={d.id} className={`rounded-[11px] border p-4 ${CARD_STYLES[sc]}`}>
+              <Card key={d.id} className={`border p-4 shadow-sm ${CARD_STYLES[sc]}`}>
                 <span className={`mb-1.5 inline-block rounded-[4px] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.08em] ${TAG_STYLES[sc]}`}>
                   {STATUS_LABEL[d.status]}
                 </span>
@@ -160,78 +193,82 @@ export function CovenantView({ deals, onAIAnalysis }: Props) {
                         ) : (
                           <span className="font-mono text-[10px] text-[#9ca3af]">Current: {pct}%</span>
                         )}
-                        <input
+                        <Input
                           type="text"
                           placeholder="Threshold…"
                           value={thresholds[key] ?? (backendCov ? backendCov.threshold : '')}
                           onChange={(e) => setThresholds((t) => ({ ...t, [key]: e.target.value }))}
                           title="Set threshold"
-                          className="w-20 border-none bg-transparent text-right font-mono text-[10px] text-[#9ca3af] outline-none placeholder:text-[#d0d5df]"
+                          className="h-7 w-20 border-0 bg-transparent p-0 text-right font-mono text-[10px] text-muted-foreground shadow-none focus-visible:ring-0"
                         />
                       </div>
                     </div>
                   )
                 })}
 
-                <div className="mt-2 border-t border-black/10 pt-2 text-[11px] leading-relaxed text-[#4b5563]">
+                <div className="mt-2 border-t border-black/10 pt-2 text-[11px] leading-relaxed text-muted-foreground">
                   {action}
                 </div>
-              </div>
+              </Card>
             )
           })}
         </div>
 
         {/* Full table */}
-        <div className="mb-2 flex items-center justify-between">
-          <div className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">All covenants — summary table</div>
-          <button
-            type="button"
-            onClick={() => onAIAnalysis(buildCovenantPrompt())}
-            className="rounded-[5px] border px-2.5 py-1 text-[11px] transition-colors"
-            style={{ borderColor: '#d0d5df', background: '#f7f8fa', color: '#4b5563' }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#9bbae8'; e.currentTarget.style.color = '#1e3f7a' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#d0d5df'; e.currentTarget.style.color = '#4b5563' }}
-          >
-            ▶ AI covenant review
-          </button>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+            All covenants — summary table
+          </div>
+          <Button type="button" variant="outline" size="sm" className="text-xs" onClick={() => onAIAnalysis(buildCovenantPrompt())}>
+            AI covenant review
+          </Button>
         </div>
-        <div className="overflow-hidden rounded-[9px] border" style={{ borderColor: '#e2e6ed' }}>
-          <table className="w-full border-collapse text-[11.5px]">
-            <thead>
-              <tr style={{ background: '#0f2044', color: 'rgba(255,255,255,0.85)' }}>
-                {['Deal', 'Type', 'Status', 'Key covenants', 'Recommended action'].map((h) => (
-                  <th key={h} className="px-3 py-2 text-left font-mono text-[10px] font-medium">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {deals.map((d) => {
-                const cfg = getInstrumentConfig(d)
-                const covs = getCovenants(d).slice(0, 3).join(', ')
-                const action = d.status === 'breach risk'
-                  ? 'Initiate waiver · Escalate to committee'
-                  : d.status === 'monitoring'
-                  ? 'Increase monitoring frequency'
-                  : 'Standard quarterly review'
-                return (
-                  <tr key={d.id} className="border-b hover:bg-[#f7f8fa]" style={{ borderColor: '#e2e6ed' }}>
-                    <td className="px-3 py-2 font-medium text-[#0d1117]">{d.name}</td>
-                    <td className="px-3 py-2">
-                      <span className="rounded-[3px] border border-[#e2e6ed] bg-[#f7f8fa] px-1.5 py-0.5 font-mono text-[9.5px] text-[#9ca3af]">{cfg.l}</span>
-                    </td>
-                    <td className="px-3 py-2">
-                      <span className={`inline-flex rounded-[5px] px-1.5 py-0.5 font-mono text-[9.5px] font-semibold ${STATUS_BADGE[d.status]}`}>
-                        {STATUS_LABEL[d.status]}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-[11px] text-[#4b5563]">{covs}</td>
-                    <td className="px-3 py-2 text-[11px] text-[#4b5563]">{action}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+        <Card className="overflow-hidden border-border shadow-sm">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-primary hover:bg-primary [&>th]:text-primary-foreground">
+                  {['Deal', 'Type', 'Status', 'Key covenants', 'Recommended action'].map((h) => (
+                    <TableHead key={h} className="font-mono text-[10px] font-medium">
+                      {h}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {deals.map((d) => {
+                  const cfg = getInstrumentConfig(d)
+                  const covs = getCovenants(d).slice(0, 3).join(', ')
+                  const action =
+                    d.status === 'breach risk'
+                      ? 'Initiate waiver · Escalate to committee'
+                      : d.status === 'monitoring'
+                        ? 'Increase monitoring frequency'
+                        : 'Standard quarterly review'
+                  return (
+                    <TableRow key={d.id}>
+                      <TableCell className="font-medium">{d.name}</TableCell>
+                      <TableCell>
+                        <span className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[9.5px] text-muted-foreground">
+                          {cfg.l}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-flex rounded-md px-1.5 py-0.5 font-mono text-[9.5px] font-semibold ${STATUS_BADGE[d.status]}`}
+                        >
+                          {STATUS_LABEL[d.status]}
+                        </span>
+                      </TableCell>
+                      <TableCell className="max-w-[200px] text-xs text-muted-foreground">{covs}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{action}</TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </Card>
       </div>
     </div>
   )

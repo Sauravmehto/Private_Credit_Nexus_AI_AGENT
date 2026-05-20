@@ -44,7 +44,7 @@ async def generate_portfolio_ai_summary(deals: list[dict[str, Any]]) -> dict[str
             f"stage={d.get('stage', 'n/a')} | "
             f"principal={_fmt_money(float(d.get('principal') or 0))} | "
             f"coupon={_fmt_pct(float(d.get('rate') or 0))} | "
-            f"EIR={_fmt_pct(float(irr_row.get('ann_irr') or 0))} | "
+            f"IRR={_fmt_pct(float(irr_row.get('ann_irr') or 0))} | "
             f"MOIC={float(irr_row.get('moic') or 0):.2f}x | "
             f"status={d.get('status', 'n/a')}"
         )
@@ -75,7 +75,7 @@ Portfolio metrics:
 - AUM: {_fmt_money(float(metrics["aum"]))}
 - Deal count: {metrics["deal_count"]}
 - Weighted cash coupon: {_fmt_pct(float(metrics["wtd_rate"]))}
-- Portfolio all-in EIR: {_fmt_pct(float(metrics["port_irr"]))}
+- Portfolio all-in IRR: {_fmt_pct(float(metrics["port_irr"]))}
 - Compliant deals: {metrics["compliant"]}
 - Monitoring deals: {metrics["monitoring"]}
 - Breach-risk deals: {metrics["breach"]}
@@ -88,7 +88,7 @@ Return concise markdown with these sections:
 2-3 sentences.
 
 ## Key Metrics
-Bullets for AUM, portfolio EIR, weighted coupon, and health split.
+Bullets for AUM, portfolio IRR, weighted coupon, and health split.
 
 ## Main Risks
 3 bullets, prioritized.

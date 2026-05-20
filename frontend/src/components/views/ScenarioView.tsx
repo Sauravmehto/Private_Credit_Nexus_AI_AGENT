@@ -5,6 +5,17 @@ import { fD, fP, fPct1 } from '../../utils/formatters'
 import { getScenarios } from '../../api'
 import type { ScenarioResult } from '../../types'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface Props {
   deals: Deal[]
@@ -59,7 +70,11 @@ export function ScenarioView({ deals, onAIAnalysis }: Props) {
   }, [d?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!deals.length || !d) {
-    return <div className="flex h-full items-center justify-center text-[13px] text-[#9ca3af]">Load portfolio data first.</div>
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+        Load portfolio data first.
+      </div>
+    )
   }
 
   const presets = buildPresets(d)
@@ -117,7 +132,7 @@ export function ScenarioView({ deals, onAIAnalysis }: Props) {
     // Show browser result instantly
     const browserIrr = scIRR(d, sc)
     const delta0 = browserIrr - baseIRR
-    setCustomResult(`EIR: ${fPct1(browserIrr)} (${delta0 >= 0 ? '+' : ''}${fPct1(delta0)} vs base)`)
+    setCustomResult(`IRR: ${fPct1(browserIrr)} (${delta0 >= 0 ? '+' : ''}${fPct1(delta0)} vs base)`)
     // Then fetch backend result
     setCustomLoading(true)
     getScenarios(d, {
@@ -127,88 +142,113 @@ export function ScenarioView({ deals, onAIAnalysis }: Props) {
       const custom = results.find(r => r.id === 'custom')
       if (custom) {
         const delta = custom.ann_irr - baseIRR
-        setCustomResult(`EIR: ${fPct1(custom.ann_irr)} (${delta >= 0 ? '+' : ''}${fPct1(delta)} vs base)`)
+        setCustomResult(`IRR: ${fPct1(custom.ann_irr)} (${delta >= 0 ? '+' : ''}${fPct1(delta)} vs base)`)
       }
     }).catch(() => {/* keep browser result */}).finally(() => setCustomLoading(false))
   }
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="px-6 py-5">
-        <div className="mb-0.5 text-[18px] font-semibold tracking-tight text-[#0d1117]">Scenario comparison</div>
-        <div className="mb-4 font-mono text-[11.5px] text-[#9ca3af]">Side-by-side IRR view across restructure options</div>
+      <div className="px-4 py-5 sm:px-6">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">Scenario comparison</h1>
+        <p className="mb-4 font-mono text-[11.5px] text-muted-foreground">Side-by-side IRR view across restructure options</p>
 
-        {/* Controls */}
-        <div className="mb-3 rounded-[11px] border bg-white p-4" style={{ borderColor: '#e2e6ed' }}>
-          <div className="mb-3 flex items-center gap-3">
-            <span className="text-[12px] font-medium text-[#0d1117]">Deal:</span>
-            <select
-              value={selectedId}
-              onChange={(e) => setSelectedId(e.target.value)}
-              className="rounded-[5px] border px-2 py-1 text-[12px] text-[#0d1117] outline-none"
-              style={{ borderColor: '#d0d5df', background: '#f7f8fa' }}
-            >
-              {deals.map((dd) => <option key={dd.id} value={dd.id}>{dd.name}</option>)}
-            </select>
-            <span className="font-mono text-[11px] text-[#9ca3af]">
-              Base EIR: <strong className="text-[#1e3f7a]">{fPct1(baseIRR)}</strong>
-              &nbsp;·&nbsp; Principal: <strong>{fD(d.principal)}</strong>
-              &nbsp;·&nbsp; Tenure: <strong>{d.tenure}mo</strong>
-            </span>
-          </div>
+        <Card className="mb-3 border-border shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Controls</CardTitle>
+            <CardDescription>Select a deal and adjust terms for a custom scenario.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2">
+                <Label className="shrink-0 text-sm">Deal</Label>
+                <Select value={selectedId} onValueChange={setSelectedId}>
+                  <SelectTrigger className="w-[min(100%,280px)] font-medium">
+                    <SelectValue placeholder="Select deal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deals.map((dd) => (
+                      <SelectItem key={dd.id} value={dd.id}>
+                        {dd.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="font-mono text-[11px] text-muted-foreground sm:ml-auto">
+                Base IRR: <strong className="text-primary">{fPct1(baseIRR)}</strong>
+                {' · '}
+                Principal: <strong>{fD(d.principal)}</strong>
+                {' · '}
+                Tenure: <strong>{d.tenure}mo</strong>
+              </p>
+            </div>
 
-          <div className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Custom scenario</div>
-          <div className="mb-2 grid grid-cols-4 gap-2">
-            {[
-              { l: 'Rate (%)',      val: customRate,    set: setCustomRate },
-              { l: 'Tenure (mo)',   val: customTenure,  set: setCustomTenure },
-              { l: 'Orig fee (%)',  val: customOrigFee, set: setCustomOrigFee },
-              { l: 'EOT fee (%)',   val: customEotFee,  set: setCustomEotFee },
-            ].map(({ l, val, set }) => (
-              <div key={l} className="flex flex-col gap-1">
-                <label className="font-mono text-[10.5px] uppercase tracking-[0.05em] text-[#9ca3af]">{l}</label>
-                <input
-                  type="number" step="0.1" value={val}
-                  onChange={(e) => set(e.target.value)}
-                  className="rounded-[5px] border px-2.5 py-1.5 font-mono text-[12.5px] text-[#0d1117] outline-none transition-colors focus:border-[#3d72c8] focus:bg-white"
-                  style={{ borderColor: '#d0d5df', background: '#f7f8fa', width: '100%' }}
-                />
+            <div>
+              <p className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Custom scenario
+              </p>
+              <div className="mb-2 grid grid-cols-2 gap-2 md:grid-cols-4">
+                {[
+                  { l: 'Rate (%)', val: customRate, set: setCustomRate },
+                  { l: 'Tenure (mo)', val: customTenure, set: setCustomTenure },
+                  { l: 'Orig fee (%)', val: customOrigFee, set: setCustomOrigFee },
+                  { l: 'EOT fee (%)', val: customEotFee, set: setCustomEotFee },
+                ].map(({ l, val, set }) => (
+                  <div key={l} className="flex flex-col gap-1.5">
+                    <Label className="font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground">{l}</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={val}
+                      onChange={(e) => set(e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { l: 'IO months',    val: customIO,  set: setCustomIO },
-              { l: 'PIK rate (%)', val: customPik, set: setCustomPik },
-            ].map(({ l, val, set }) => (
-              <div key={l} className="flex flex-col gap-1">
-                <label className="font-mono text-[10.5px] uppercase tracking-[0.05em] text-[#9ca3af]">{l}</label>
-                <input
-                  type="number" step="0.1" value={val}
-                  onChange={(e) => set(e.target.value)}
-                  className="rounded-[5px] border px-2.5 py-1.5 font-mono text-[12.5px] text-[#0d1117] outline-none transition-colors focus:border-[#3d72c8] focus:bg-white"
-                  style={{ borderColor: '#d0d5df', background: '#f7f8fa', width: '100%' }}
-                />
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                {[
+                  { l: 'IO months', val: customIO, set: setCustomIO },
+                  { l: 'PIK rate (%)', val: customPik, set: setCustomPik },
+                ].map(({ l, val, set }) => (
+                  <div key={l} className="flex flex-col gap-1.5">
+                    <Label className="font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground">{l}</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={val}
+                      onChange={(e) => set(e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                ))}
+                <div className="col-span-2 flex flex-wrap items-end justify-end gap-2 md:col-span-2">
+                  <Button type="button" size="sm" onClick={calcCustom} disabled={customLoading}>
+                    {customLoading ? 'Computing…' : 'Calculate'}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      onAIAnalysis(
+                        `Analyse restructure scenarios for ${d.name} (${d.instrument_type}, ${fD(d.principal)} at ${fP(d.rate)}, IO ${d.io}mo, tenure ${d.tenure}mo). Compare base case, maturity extension +6mo, rate step-up +150bps, covenant waiver with 2% fee, distressed restructure. For each: IRR change in bps, MOIC impact, recommendation.`,
+                      )
+                    }
+                  >
+                    Ask Claude AI
+                  </Button>
+                </div>
               </div>
-            ))}
-            <div className="col-span-2 flex items-end justify-end gap-2">
-              <button type="button" onClick={calcCustom} disabled={customLoading}
-                className="rounded-[5px] bg-[#162d5e] px-3 py-1.5 text-[11.5px] font-medium text-white hover:bg-[#0f2044] disabled:opacity-70">
-                {customLoading ? 'Computing…' : 'Calculate'}
-              </button>
-              <button type="button" onClick={() => onAIAnalysis(`Analyse restructure scenarios for ${d.name} (${d.instrument_type}, ${fD(d.principal)} at ${fP(d.rate)}, IO ${d.io}mo, tenure ${d.tenure}mo). Compare base case, maturity extension +6mo, rate step-up +150bps, covenant waiver with 2% fee, distressed restructure. For each: EIR change in bps, MOIC impact, recommendation.`)}
-                className="rounded-[5px] border px-3 py-1.5 text-[11.5px] text-[#4b5563] hover:border-[#9bbae8] hover:text-[#1e3f7a]"
-                style={{ borderColor: '#d0d5df', background: '#f7f8fa' }}>
-                ▶ Ask Claude AI
-              </button>
             </div>
-          </div>
-          {customResult && (
-            <div className="mt-2 rounded-[5px] border border-[#cddaf4] bg-[#eaf0fb] px-3 py-2 font-mono text-[11.5px] text-[#1e3f7a]">
-              {customResult}
-            </div>
-          )}
-        </div>
+            {customResult && (
+              <div className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 font-mono text-[11.5px] text-primary">
+                {customResult}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Cards */}
         <div className="mb-3 grid grid-cols-4 gap-2.5">
@@ -243,21 +283,28 @@ export function ScenarioView({ deals, onAIAnalysis }: Props) {
           })}
         </div>
 
-        {/* Chart */}
-        <div className="rounded-[11px] border bg-white p-4" style={{ borderColor: '#e2e6ed' }}>
-          <div className="mb-3 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">IRR comparison across scenarios</div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}>
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9ca3af' }} />
-              <YAxis tickFormatter={(v) => `${v.toFixed(1)}%`} tick={{ fontSize: 10, fill: '#9ca3af' }} />
-              <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'EIR']} />
-              <ReferenceLine y={baseIRR * 100} stroke="#9ca3af" strokeDasharray="4 2" />
-              <Bar dataKey="irr" radius={[3, 3, 0, 0]}>
-                {chartData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <Card className="border-border shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-mono text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+              IRR comparison across scenarios
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}>
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9ca3af' }} />
+                <YAxis tickFormatter={(v) => `${v.toFixed(1)}%`} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+                <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'IRR']} />
+                <ReferenceLine y={baseIRR * 100} stroke="#9ca3af" strokeDasharray="4 2" />
+                <Bar dataKey="irr" radius={[3, 3, 0, 0]}>
+                  {chartData.map((entry, i) => (
+                    <Cell key={i} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

@@ -1,5 +1,11 @@
+import type { ReactNode } from 'react'
 import type { Deal, AppView, DealStatus } from '../dealTypes'
 import { getInstrumentConfig } from '../dealTypes'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 interface Props {
   deals: Deal[]
@@ -10,9 +16,11 @@ interface Props {
   onViewChange: (v: AppView) => void
   onDealSelect: (id: string) => void
   onChangeSource: () => void
+  /** Close mobile drawer after navigation */
+  onMobileNavClose?: () => void
 }
 
-const NAV_ITEMS: { id: AppView; label: string; icon: React.ReactNode }[] = [
+const NAV_ITEMS: { id: AppView; label: string; icon: ReactNode }[] = [
   {
     id: 'portfolio',
     label: 'Portfolio',
@@ -64,12 +72,32 @@ function dotColor(s: DealStatus): string {
   return '#ef4444'
 }
 
-export function Sidebar({ deals, view, currentDealId, health, onViewChange, onDealSelect }: Props) {
+export function Sidebar({
+  deals,
+  view,
+  currentDealId,
+  sourceName: _sourceName,
+  health,
+  onViewChange,
+  onDealSelect,
+  onChangeSource,
+  onMobileNavClose,
+}: Props) {
   const isLive = deals.length > 0
+
+  function handleViewChange(v: AppView) {
+    onViewChange(v)
+    onMobileNavClose?.()
+  }
+
+  function handleDealSelect(id: string) {
+    onDealSelect(id)
+    onMobileNavClose?.()
+  }
 
   return (
     <div
-      className="flex w-[220px] shrink-0 flex-col overflow-hidden border-r"
+      className="flex h-full min-h-0 w-[220px] shrink-0 flex-col overflow-hidden border-r"
       style={{
         background: 'linear-gradient(175deg, #0a1628 0%, #050d1a 100%)',
         borderColor: 'rgba(255,255,255,0.06)',
@@ -95,27 +123,38 @@ export function Sidebar({ deals, view, currentDealId, health, onViewChange, onDe
         </p>
       </div>
 
+      <Separator className="bg-white/10" />
+
       {/* Navigation */}
-      <div className="px-1.5 pt-2.5">
+      <div className="shrink-0 px-1.5 pt-2.5">
         <p className="mb-1.5 px-2 text-[9px] font-semibold uppercase tracking-[0.12em]"
            style={{ color: 'rgba(255,255,255,0.28)' }}>Views</p>
         <div className="space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const active = view === item.id
             return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onViewChange(item.id)}
-                className={`relative flex w-full items-center gap-1.5 rounded-[5px] border px-2 py-1.5 text-left text-[12px] transition-all duration-150 ${
-                  active
-                    ? 'border-[rgba(79,156,249,0.22)] bg-[rgba(79,156,249,0.14)] text-white si-active'
-                    : 'border-transparent text-[rgba(255,255,255,0.45)] hover:bg-[rgba(255,255,255,0.06)] hover:text-white'
-                }`}
-              >
-                {item.icon}
-                <span className="truncate">{item.label}</span>
-              </button>
+              <Tooltip key={item.id}>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => handleViewChange(item.id)}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'relative h-auto w-full justify-start gap-1.5 rounded-[5px] border px-2 py-1.5 text-left text-[12px] font-normal transition-all duration-150',
+                      active
+                        ? 'border-[rgba(79,156,249,0.22)] bg-[rgba(79,156,249,0.14)] text-white si-active hover:bg-[rgba(79,156,249,0.18)] hover:text-white'
+                        : 'border-transparent text-[rgba(255,255,255,0.45)] hover:bg-[rgba(255,255,255,0.06)] hover:text-white',
+                    )}
+                  >
+                    {item.icon}
+                    <span className="truncate">{item.label}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-[200px] border-border bg-popover text-popover-foreground">
+                  {item.label}
+                </TooltipContent>
+              </Tooltip>
             )
           })}
         </div>
@@ -123,32 +162,46 @@ export function Sidebar({ deals, view, currentDealId, health, onViewChange, onDe
 
       {/* Deal list */}
       {isLive && (
-        <div className="mt-2 px-1.5">
-          <p className="mb-1.5 px-2 text-[9px] font-semibold uppercase tracking-[0.12em]"
-             style={{ color: 'rgba(255,255,255,0.28)' }}>Deals</p>
-          <div className="space-y-0.5 overflow-y-auto" style={{ maxHeight: 220 }}>
-            {deals.map((d) => {
-              const cfg = getInstrumentConfig(d)
-              const active = currentDealId === d.id
-              return (
-                <button
-                  key={d.id}
-                  type="button"
-                  onClick={() => onDealSelect(d.id)}
-                  className={`relative flex w-full items-center gap-1.5 rounded-[5px] border px-2 py-1.5 text-left text-[12px] transition-all duration-150 ${
-                    active
-                      ? 'border-[rgba(79,156,249,0.22)] bg-[rgba(79,156,249,0.14)] text-white'
-                      : 'border-transparent text-[rgba(255,255,255,0.45)] hover:bg-[rgba(255,255,255,0.06)] hover:text-white'
-                  }`}
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: dotColor(d.status) }} />
-                  <span className="flex-1 truncate">{d.name}</span>
-                  <span className="shrink-0 font-mono text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>{cfg.l}</span>
-                </button>
-              )
-            })}
+        <>
+          <Separator className="my-2 bg-white/10" />
+          <div className="flex min-h-0 flex-1 flex-col px-1.5 pb-1">
+            <p className="mb-1.5 shrink-0 px-2 text-[9px] font-semibold uppercase tracking-[0.12em]"
+               style={{ color: 'rgba(255,255,255,0.28)' }}>Deals</p>
+            <ScrollArea className="min-h-0 flex-1 pr-1">
+              <div className="space-y-0.5 pb-1">
+                {deals.map((d) => {
+                  const cfg = getInstrumentConfig(d)
+                  const active = currentDealId === d.id
+                  return (
+                    <Tooltip key={d.id}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => handleDealSelect(d.id)}
+                          aria-current={active ? 'true' : undefined}
+                          className={cn(
+                            'relative h-auto w-full justify-start gap-1.5 rounded-[5px] border px-2 py-1.5 text-left text-[12px] font-normal transition-all duration-150',
+                            active
+                              ? 'border-[rgba(79,156,249,0.22)] bg-[rgba(79,156,249,0.14)] text-white hover:bg-[rgba(79,156,249,0.18)] hover:text-white'
+                              : 'border-transparent text-[rgba(255,255,255,0.45)] hover:bg-[rgba(255,255,255,0.06)] hover:text-white',
+                          )}
+                        >
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: dotColor(d.status) }} />
+                          <span className="flex-1 truncate">{d.name}</span>
+                          <span className="shrink-0 font-mono text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>{cfg.l}</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-[240px] border-border bg-popover text-popover-foreground">
+                        {d.name}
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                })}
+              </div>
+            </ScrollArea>
           </div>
-        </div>
+        </>
       )}
 
       {/* Footer */}
@@ -158,6 +211,21 @@ export function Sidebar({ deals, view, currentDealId, health, onViewChange, onDe
           className="mb-3 h-[1px] w-full rounded-full"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(79,156,249,0.35), transparent)' }}
         />
+
+        {isLive && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mb-3 w-full border-white/15 bg-white/5 text-[11px] text-white/80 hover:bg-white/10 hover:text-white"
+            onClick={() => {
+              onChangeSource()
+              onMobileNavClose?.()
+            }}
+          >
+            Change portfolio source
+          </Button>
+        )}
 
         {/* Brand */}
         <div className="mb-2 flex items-center gap-2">

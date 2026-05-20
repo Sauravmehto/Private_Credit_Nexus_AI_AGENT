@@ -172,7 +172,9 @@ def health() -> dict[str, str]:
 
 @app.get("/sample/venture_debt_portfolio.xlsx")
 def download_sample_portfolio() -> FileResponse:
-    sample_path = Path(__file__).resolve().parents[1] / "database" / "venture_debt_portfolio.xlsx"
+    sample_path = Path(__file__).resolve().parents[1] / "database" / "sample-portfolio.xlsx"
+    if not sample_path.exists():
+        sample_path = Path(__file__).resolve().parents[1] / "database" / "venture_debt_portfolio.xlsx"
     if not sample_path.exists():
         raise HTTPException(status_code=404, detail="Sample file not found.")
     return FileResponse(
