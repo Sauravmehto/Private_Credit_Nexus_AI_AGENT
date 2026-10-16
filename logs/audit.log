@@ -50,3 +50,15 @@
 2026-10-16 14:48:04,200 ERROR audit_log_db_write_failed tool=calculate_term_loan_irr err=The DNS query name does not exist: _mongodb._tcp.private-credit-db.socfzni.mongodb.net.
 2026-10-16 14:48:04,220 ERROR audit_log_db_write_failed tool=calculate_term_loan_irr err=The DNS query name does not exist: _mongodb._tcp.private-credit-db.socfzni.mongodb.net.
 2026-10-16 14:48:04,222 ERROR audit_log_db_write_failed tool=calculate_term_loan_irr err=The DNS query name does not exist: _mongodb._tcp.private-credit-db.socfzni.mongodb.net.
+2026-10-16 15:00:43,359 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_term_loan_irr", "timestamp": "2026-10-16T09:30:43.359417+00:00", "ip_address": "unknown", "request_id": "3c0f0357-bca7-4d36-82aa-7c8c0d4d432a"}
+2026-10-16 15:00:43,428 ERROR audit_log_db_write_failed tool=calculate_term_loan_irr err=The DNS query name does not exist: _mongodb._tcp.private-credit-db.socfzni.mongodb.net.
+2026-10-16 15:02:02,615 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_irr", "timestamp": "2026-10-16T09:32:02.614957+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,631 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_irr", "timestamp": "2026-10-16T09:32:02.631014+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,633 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_term_loan_irr", "timestamp": "2026-10-16T09:32:02.633535+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,637 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_note_irr", "timestamp": "2026-10-16T09:32:02.637276+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,639 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "generate_warrant_irr", "timestamp": "2026-10-16T09:32:02.639729+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,640 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "generate_warrant_irr", "timestamp": "2026-10-16T09:32:02.640256+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,640 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_warrant_irr", "timestamp": "2026-10-16T09:32:02.640643+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,643 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "calculate_conv_note_irr", "timestamp": "2026-10-16T09:32:02.643402+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,646 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "generate_term_sheet", "timestamp": "2026-10-16T09:32:02.646731+00:00", "ip_address": "unknown", "request_id": null}
+2026-10-16 15:02:02,647 INFO {"event": "tool_audit_log", "user_id": "anonymous", "tool": "create_irr_model", "timestamp": "2026-10-16T09:32:02.647150+00:00", "ip_address": "unknown", "request_id": null}
